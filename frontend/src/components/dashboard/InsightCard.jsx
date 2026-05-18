@@ -1,0 +1,35 @@
+import { Sparkles } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { ROUTES } from '../../utils/constants'
+
+function InsightCard({ insight = 'Tingkat stresmu sedang menanjak tajam. Sangat disarankan untuk segera menyelesaikan tugas prioritas dan mengambil jeda yang cukup malam ini.' }) {
+  const navigate = useNavigate()
+
+  return (
+    <div className="bg-gradient-to-br from-blue-50 to-white rounded-2xl p-6 border-[0.67px] border-blue-100 shadow-[0px_1px_3px_0px_rgba(0,0,0,0.10)] relative overflow-hidden">
+      
+      {/* Decorative Blur Top Right */}
+      <div className="absolute top-[-30px] right-[-30px] w-32 h-32 bg-blue-100/60 rounded-full blur-2xl z-0" />
+
+      <div className="relative z-10 flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-full bg-blue-800 shadow-sm flex items-center justify-center text-white">
+          <Sparkles size={18} />
+        </div>
+        <span className="text-lg font-semibold text-blue-800">Insight AI Hari Ini</span>
+      </div>
+      
+      <p className="relative z-10 text-sm text-gray-700 leading-relaxed mb-6">
+        {insight}
+      </p>
+      
+      <button
+        onClick={() => navigate(ROUTES.RESULT)}
+        className="relative z-10 text-sm text-blue-800 font-medium bg-white border border-blue-200 rounded-xl px-4 py-3 hover:bg-blue-50 transition-colors w-full text-center shadow-sm"
+      >
+        Lihat Rekomendasi Detail
+      </button>
+    </div>
+  )
+}
+
+export default InsightCard

@@ -1,0 +1,67 @@
+import { classNames } from '../../utils/helpers'
+
+const variants = {
+  primary: 'bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800 disabled:bg-slate-300',
+  secondary: 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 active:bg-slate-100 disabled:opacity-50',
+  ghost:     'text-slate-600 hover:bg-slate-100 active:bg-slate-200 disabled:opacity-50',
+  danger:    'bg-red-500 text-white hover:bg-red-600 active:bg-red-700 disabled:opacity-50',
+  outline: 'border border-primary-600 text-primary-600 hover:bg-primary-50 active:bg-primary-100 disabled:opacity-50',
+}
+
+const sizes = {
+  sm:   'h-8  px-3 text-xs  rounded-lg  gap-1.5',
+  md:   'h-10 px-4 text-sm  rounded-xl  gap-2',
+  lg:   'h-12 px-6 text-sm  rounded-xl  gap-2',
+  xl:   'h-14 px-8 text-base rounded-2xl gap-2.5',
+}
+
+function Button({
+  children,
+  variant = 'primary',
+  size = 'md',
+  loading = false,
+  disabled = false,
+  fullWidth = false,
+  leftIcon,
+  rightIcon,
+  className = '',
+  onClick,
+  type = 'button',
+  ...props
+}) {
+  return (
+    <button
+      type={type}
+      onClick={onClick}
+      disabled={disabled || loading}
+      className={classNames(
+        'inline-flex items-center justify-center font-medium',
+        'focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
+        'disabled:cursor-not-allowed',
+        variants[variant],
+        sizes[size],
+        fullWidth && 'w-full',
+        className
+      )}
+      {...props}
+    >
+      {loading ? (
+        <>
+          <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+          </svg>
+          <span>Memuat...</span>
+        </>
+      ) : (
+        <>
+          {leftIcon && <span className="flex-shrink-0">{leftIcon}</span>}
+          {children}
+          {rightIcon && <span className="flex-shrink-0">{rightIcon}</span>}
+        </>
+      )}
+    </button>
+  )
+}
+
+export default Button
