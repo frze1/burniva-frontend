@@ -4,43 +4,43 @@ require("express");
 const router =
 express.Router();
 
-const authMiddleware =
-require("../middleware/authMiddleware");
-
 const {
-
- getTodos,
- createTodo,
- updateTodo,
- deleteTodo
-
+getTodos,
+toggleTodo,
+createTodo,
+deleteTodo
 } =
 require(
 "../controllers/todoController"
 );
 
+const authMiddleware =
+require(
+"../middleware/authMiddleware"
+);
+
 router.get(
- "/",
- authMiddleware,
- getTodos
+"/",
+authMiddleware,
+getTodos
 );
 
 router.post(
- "/",
- authMiddleware,
- createTodo
+"/",
+authMiddleware,
+createTodo
 );
 
 router.put(
- "/:id",
- authMiddleware,
- updateTodo
+"/:id",
+authMiddleware,
+toggleTodo
 );
 
 router.delete(
- "/:id",
- authMiddleware,
- deleteTodo
+"/:id",
+authMiddleware,
+deleteTodo
 );
 
 module.exports =

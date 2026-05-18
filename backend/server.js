@@ -8,6 +8,7 @@ const predictionRoutes = require("./src/routes/predictionRoutes");
 const dashboardRoutes = require("./src/routes/dashboardRoutes");
 const historyRoutes = require("./src/routes/historyRoutes");
 const todoRoutes = require("./src/routes/todoRoutes");
+const assessmentRoutes = require("./src/routes/assessmentRoutes");
 const errorMiddleware = require("./src/middleware/errorMiddleware");
 require("./src/models");
 
@@ -16,10 +17,21 @@ require("dotenv").config();
 const app = express();
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL,
+  origin: 'http://localhost:5173',
   credentials: true
 }));
-app.use(express.json());
+app.use(
+  express.json({
+    limit: '10mb'
+  })
+);
+
+app.use(
+  express.urlencoded({
+    extended: true,
+    limit: '10mb'
+  })
+);
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/user", userRoutes);
@@ -28,6 +40,7 @@ app.use("/api/v1/prediction", predictionRoutes);
 app.use("/api/v1/dashboard", dashboardRoutes);
 app.use("/api/v1/history", historyRoutes);
 app.use("/api/v1/todos", todoRoutes);
+app.use("/api/v1/assessment", assessmentRoutes);
 
 app.get("/health", (req, res) => {
   res.status(200).json({

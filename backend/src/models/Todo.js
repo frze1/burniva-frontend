@@ -1,61 +1,79 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
+module.exports = (
+  sequelize,
+  DataTypes
+) => {
 
-const Todo = sequelize.define("Todo", {
+  const Todo =
+    sequelize.define(
+      "Todo",
+      {
+        id: {
+          type:
+            DataTypes.UUID,
+          defaultValue:
+            DataTypes.UUIDV4,
+          primaryKey: true,
+        },
 
-  id: {
-    type: DataTypes.UUID,
-    defaultValue: DataTypes.UUIDV4,
-    primaryKey: true
-  },
+        user_id: {
+          type:
+            DataTypes.UUID,
+          allowNull: false,
+        },
 
-  title: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
+        title: {
+          type:
+            DataTypes.STRING,
+          allowNull: false,
+        },
 
-  description: {
-    type: DataTypes.TEXT,
-    allowNull: true
-  },
+        description: {
+          type:
+            DataTypes.TEXT,
+        },
 
-  category: {
-    type: DataTypes.ENUM(
-      "Mental",
-      "Tidur",
-      "Aktivitas",
-      "Akademik"
-    ),
-    allowNull: false
-  },
+        priority: {
+          type:
+            DataTypes.STRING,
+          defaultValue:
+            "medium",
+        },
 
-  priority: {
-    type: DataTypes.ENUM(
-      "Tinggi",
-      "Sedang",
-      "Rendah"
-    ),
-    allowNull: false
-  },
+        status: {
+          type:
+            DataTypes.STRING,
+          defaultValue:
+            "pending",
+        },
 
-  icon: {
-    type: DataTypes.STRING,
-    allowNull: true
-  },
+        generated_by_ai:
+          {
+            type:
+              DataTypes.BOOLEAN,
+            defaultValue:
+              true,
+          },
+      },
 
-  is_completed: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: false
-  },
+      {
+        tableName:
+          "todos",
+      }
+    );
 
-  is_ai_generated: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: false
-  }
+  Todo.associate =
+    (models) => {
 
-}, {
-  timestamps: true,
-  tableName: "todos"
-});
+      Todo.belongsTo(
+        models.User,
+        {
+          foreignKey:
+            "user_id",
+          as: "user",
+        }
+      );
 
-module.exports = Todo;
+    };
+
+  return Todo;
+};

@@ -11,40 +11,36 @@ const authMiddleware = (
     const authHeader =
       req.headers.authorization;
 
-    // CHECK TOKEN
-    if (!authHeader) {
-
-      return res.status(401)
-      .json({
+    if (
+      !authHeader ||
+      !authHeader.startsWith(
+        "Bearer "
+      )
+    ) {
+      return res.status(401).json({
         message:
-        "Token tidak ditemukan"
+          "Unauthorized"
       });
-
     }
 
-    // FORMAT:
-    // Bearer tokenxxxxx
     const token =
       authHeader.split(" ")[1];
 
-    // VERIFY JWT
     const decoded =
       jwt.verify(
         token,
         process.env.JWT_SECRET
       );
 
-    // SIMPAN USER LOGIN
     req.user = decoded;
 
     next();
 
   } catch (error) {
 
-    return res.status(401)
-    .json({
+    return res.status(401).json({
       message:
-      "Token tidak valid"
+        "Token tidak valid"
     });
 
   }
@@ -52,4 +48,4 @@ const authMiddleware = (
 };
 
 module.exports =
-authMiddleware;
+  authMiddleware;

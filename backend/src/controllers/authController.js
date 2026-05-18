@@ -10,7 +10,7 @@ const register = async (req, res) => {
   try {
 
     const {
-      fullname,
+      name,
       email,
       password,
       confirm_password
@@ -18,7 +18,7 @@ const register = async (req, res) => {
 
     // VALIDASI
     if (
-      !fullname ||
+      !name ||
       !email ||
       !password ||
       !confirm_password
@@ -30,7 +30,10 @@ const register = async (req, res) => {
     }
 
     // PASSWORD MATCH
-    if (password !== confirm_password) {
+    if (
+      password !==
+      confirm_password
+    ) {
       return res.status(400).json({
         message:
           "Konfirmasi password tidak sama"
@@ -52,12 +55,15 @@ const register = async (req, res) => {
 
     // HASH PASSWORD
     const hashedPassword =
-      await bcrypt.hash(password, 10);
+      await bcrypt.hash(
+        password,
+        10
+      );
 
     // CREATE USER
     const user =
       await User.create({
-        fullname,
+        name,
         email,
         password:
           hashedPassword
@@ -66,10 +72,22 @@ const register = async (req, res) => {
     res.status(201).json({
       message:
         "Register berhasil",
-      user
+
+      user: {
+        id:
+          user.id,
+
+        name:
+          user.name,
+
+        email:
+          user.email
+      }
     });
 
   } catch (error) {
+
+    console.error(error);
 
     res.status(500).json({
       message:
@@ -139,11 +157,32 @@ const login = async (req, res) => {
       token,
 
       user: {
-        id: user.id,
-        fullname:
-          user.fullname,
+        id:
+          user.id,
+
+        name:
+          user.name,
+
         email:
-          user.email
+          user.email,
+
+        gender:
+          user.gender,
+
+        age:
+          user.age,
+
+        university:
+          user.university,
+
+        major:
+          user.major,
+
+        semester:
+          user.semester,
+
+        profile_image:
+          user.profile_image
       }
     });
 
@@ -160,7 +199,126 @@ const login = async (req, res) => {
 
 };
 
+
+// GET PROFILE
+const getProfile =
+  async (req, res) => {
+
+    try {
+
+      const user =
+        await User.findByPk(
+          req.user.id
+        );
+
+      if (!user) {
+        return res.status(404).json({
+          message:
+            "User tidak ditemukan"
+        });
+      }
+
+      res.status(200).json({
+        id:
+          user.id,
+
+        name:
+          user.name,
+
+        email:
+          user.email,
+
+        gender:
+          user.gender,
+
+        age:
+          user.age,
+
+        university:
+          user.university,
+
+        major:
+          user.major,
+
+        semester:
+          user.semester,
+
+        profile_image:
+          user.profile_image
+      });
+
+    } catch (error) {
+
+      res.status(500).json({
+        message:
+          "Server error",
+        error:
+          error.message
+      });
+
+    }
+
+  };
+
+
+// UPDATE PROFILE
+const updateProfile =
+  async (req, res) => {
+
+    try {
+
+      const user =
+        await User.findByPk(
+          req.user.id
+        );
+
+      if (!user) {
+        return res.status(404).json({
+          message:
+            "User tidak ditemukan"
+        });
+      }
+
+      const {
+        name,
+        email,
+        gender,
+        age,
+        university,
+        major,
+        semester,
+        profile_image
+      } = req.body;
+
+      await user.update({
+        name,
+        email,
+        gender,
+        age,
+        university,
+        major,
+        semester,
+        profile_image,
+      });
+
+      res.json(user);
+
+    } catch (error) {
+
+      res.status(500).json({
+        message:
+          "Server error",
+        error:
+          error.message
+      });
+
+    }
+
+  };
+
 module.exports = {
   register,
-  login
+  login,
+  getProfile,
+  updateProfile
 };

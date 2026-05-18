@@ -4,20 +4,22 @@ require("express");
 const router =
 express.Router();
 
-const authMiddleware =
-require("../middleware/authMiddleware");
-
 const {
- getDashboard
+getDashboard
 } =
 require(
 "../controllers/dashboardController"
 );
 
+const authMiddleware =
+require(
+"../middleware/authMiddleware"
+);
+
 router.get(
- "/",
- authMiddleware,
- getDashboard
+"/",
+authMiddleware,
+getDashboard
 );
 
 module.exports =

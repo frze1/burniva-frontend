@@ -1,7 +1,10 @@
+const { DataTypes } = require("sequelize");
+const sequelize = require("../config/database");
+
 const User = require("./User");
-const DailyInput = require("./DailyInput");
+const DailyInput = require("./DailyInput")(sequelize, DataTypes);
 const Prediction = require("./Prediction");
-const Todo = require("./Todo");
+const Todo = require("./Todo")(sequelize, DataTypes);
 
 // USER → DAILY INPUT
 User.hasMany(DailyInput, {

@@ -4,20 +4,29 @@ require("express");
 const router =
 express.Router();
 
-const authMiddleware =
-require("../middleware/authMiddleware");
-
 const {
- getHistory
+getHistory,
+getHistoryById
 } =
 require(
 "../controllers/historyController"
 );
 
+const authMiddleware =
+require(
+"../middleware/authMiddleware"
+);
+
 router.get(
- "/",
- authMiddleware,
- getHistory
+"/",
+authMiddleware,
+getHistory
+);
+
+router.get(
+"/:id",
+authMiddleware,
+getHistoryById
 );
 
 module.exports =

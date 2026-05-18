@@ -1,70 +1,118 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
+module.exports = (
+  sequelize,
+  DataTypes
+) => {
+  const DailyInput =
+    sequelize.define(
+      'DailyInput',
+      {
+        id: {
+          type:
+            DataTypes.UUID,
+          defaultValue:
+            DataTypes.UUIDV4,
+          primaryKey: true,
+        },
 
-const DailyInput = sequelize.define("DailyInput", {
+        user_id: {
+          type:
+            DataTypes.UUID,
+          allowNull: false,
+        },
 
-  id: {
-    type: DataTypes.UUID,
-    defaultValue: DataTypes.UUIDV4,
-    primaryKey: true
-  },
+        // MENTAL
+        stress: {
+          type:
+            DataTypes.INTEGER,
+        },
 
-  // MENTAL
-  stress_level: {
-    type: DataTypes.INTEGER,
-    allowNull: false
-  },
+        anxiety: {
+          type:
+            DataTypes.INTEGER,
+        },
 
-  anxiety_level: {
-    type: DataTypes.INTEGER,
-    allowNull: false
-  },
+        emotional_pressure: {
+          type:
+            DataTypes.INTEGER,
+        },
 
-  emotional_pressure: {
-    type: DataTypes.INTEGER,
-    allowNull: false
-  },
+        // AKADEMIK
+        academic_pressure: {
+          type:
+            DataTypes.INTEGER,
+        },
 
-  // AKADEMIK
-  academic_pressure: {
-    type: DataTypes.INTEGER,
-    allowNull: false
-  },
+        study_hours: {
+          type:
+            DataTypes.FLOAT,
+        },
 
-  study_duration: {
-    type: DataTypes.INTEGER,
-    allowNull: false
-  },
+        // GAYA HIDUP
+        sleep_hours: {
+          type:
+            DataTypes.FLOAT,
+        },
 
-  // GAYA HIDUP
-  sleep_duration: {
-    type: DataTypes.INTEGER,
-    allowNull: false
-  },
+        financial_pressure:
+          {
+            type:
+              DataTypes.INTEGER,
+          },
 
-  financial_pressure: {
-    type: DataTypes.INTEGER,
-    allowNull: false
-  },
+        family_expectation:
+          {
+            type:
+              DataTypes.INTEGER,
+          },
 
-  family_expectation: {
-    type: DataTypes.INTEGER,
-    allowNull: false
-  },
+        social_support: {
+          type:
+            DataTypes.INTEGER,
+        },
 
-  social_support: {
-    type: DataTypes.INTEGER,
-    allowNull: false
-  },
+        activity_hours: {
+          type:
+            DataTypes.FLOAT,
+        },
 
-  exercise_duration: {
-    type: DataTypes.INTEGER,
-    defaultValue: 0
-  }
+        // HASIL AI
+        burnout_score: {
+          type:
+            DataTypes.INTEGER,
+          defaultValue: 0,
+        },
 
-}, {
-  timestamps: true,
-  tableName: "daily_inputs"
-});
+        burnout_level: {
+          type:
+            DataTypes.STRING,
+          defaultValue:
+            'Rendah',
+        },
 
-module.exports = DailyInput;
+        recommendation: {
+          type:
+            DataTypes.JSON,
+          allowNull: true,
+        },
+      },
+
+      {
+        tableName:
+          'daily_inputs',
+      }
+    )
+
+  DailyInput.associate =
+    (models) => {
+      DailyInput.belongsTo(
+        models.User,
+        {
+          foreignKey:
+            'user_id',
+          as: 'user',
+        }
+      )
+    }
+
+  return DailyInput
+}
