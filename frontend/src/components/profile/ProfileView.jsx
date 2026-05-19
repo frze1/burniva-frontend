@@ -1,4 +1,3 @@
-import React from 'react';
 import { User, Mail, GraduationCap, Calendar, BookOpen, Heart } from 'lucide-react';
 
 function InfoItem({ icon: Icon, label, value, hideBorder }) {
