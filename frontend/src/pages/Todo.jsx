@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { getTodos, toggleTodo, createTodo, deleteTodo } from '../services/todoService'
 import {
   Sparkles, Plus, Trash2, ArrowLeft,
   Coffee, Moon, BookOpen, Activity,
@@ -7,7 +8,6 @@ import {
 import { classNames } from '../utils/helpers'
 import ProgressBar from '../components/ui/ProgressBar'
 
-// Icon map
 const ICONS = {
   coffee:    <Coffee size={16} />,
   moon:      <Moon size={16} />,
@@ -18,6 +18,7 @@ const ICONS = {
   globe:     <Globe size={16} />,
   smile:     <Smile size={16} />,
   list:      <ListChecks size={16} />,
+  sparkles:  <Sparkles size={16} />,
 }
 
 const ICON_OPTIONS = [
@@ -316,9 +317,32 @@ function TodoItem({ todo, onToggle, onDelete }) {
 
 // ── Halaman Utama Todo ────────────────────────────────────────
 function Todo() {
-  const [todos, setTodos]       = useState(INITIAL_TODOS)
+  const [todos, setTodos]       = useState([])
   const [filter, setFilter]     = useState('Semua')
   const [showAdd, setShowAdd]   = useState(false)
+
+  useEffect(() => {
+    loadTodos();
+  }, []);
+
+  const loadTodos = async () => {
+    try {
+      const data = await getTodos();
+      const mapPriority = { high: 'Tinggi', medium: 'Sedang', low: 'Rendah' };
+      const formatted = data.map(t => ({
+        id: t.id,
+        title: t.title,
+        desc: t.description,
+        priority: mapPriority[t.priority] || 'Sedang',
+        category: t.generated_by_ai ? 'AI Suggestion' : 'Personal',
+        icon: t.generated_by_ai ? 'sparkles' : 'coffee',
+        done: t.status === 'completed'
+      }));
+      setTodos(formatted);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const done  = todos.filter(t => t.done).length
   const total = todos.length
@@ -329,26 +353,46 @@ function Todo() {
     return true
   })
 
-  const handleToggle = (id) => {
-    setTodos(prev => prev.map(t => t.id === id ? { ...t, done: !t.done } : t))
-  }
-
-  const handleDelete = (id) => {
-    setTodos(prev => prev.filter(t => t.id !== id))
-  }
-
-  const handleSave = (form) => {
-    const newTodo = {
-      id: Date.now(),
-      title: form.title,
-      desc: form.desc,
-      category: form.category,
-      priority: form.priority,
-      icon: form.icon,
-      done: false,
+  const handleToggle = async (id) => {
+    try {
+      // Optimistic update
+      setTodos(prev => prev.map(t => t.id === id ? { ...t, done: !t.done } : t))
+      await toggleTodo(id);
+      loadTodos();
+    } catch (error) {
+      console.error(error);
+      loadTodos(); // Revert on failure
     }
-    setTodos(prev => [newTodo, ...prev])
-    setShowAdd(false)
+  }
+
+  const handleDelete = async (id) => {
+    try {
+      // Optimistic update
+      setTodos(prev => prev.filter(t => t.id !== id))
+      await deleteTodo(id);
+      loadTodos();
+    } catch (error) {
+      console.error(error);
+      loadTodos(); // Revert on failure
+    }
+  }
+
+  const handleSave = async (form) => {
+    try {
+      await createTodo({
+        title: form.title,
+        description: form.desc,
+        category: form.category,
+        priority: form.priority.toLowerCase(),
+        icon: form.icon
+      });
+
+      await loadTodos();
+      setShowAdd(false);
+    } catch (error) {
+      console.error(error);
+      alert("Gagal menambahkan tugas");
+    }
   }
 
   if (showAdd) {

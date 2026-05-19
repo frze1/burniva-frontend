@@ -8,35 +8,28 @@ import AcademicStep  from '../components/form/AcademicStep'
 import LifestyleStep from '../components/form/LifestyleStep'
 import ReviewStep    from '../components/form/ReviewStep'
 import burnoutService from '../services/burnout/burnoutService'
-
-// INITIAL DATA DIUPDATE SESUAI DESAIN "TINJAU DATA" DI FIGMA
-const initialData = {
-  // Mental
-  stres: 7, 
-  kecemasan: 5, 
-  depresi: 5, 
-  
-  // Akademik
-  tekananAkademik: 7, 
-  jamBelajar: 6, // 6 Jam 0 Menit
-  
-  // Gaya Hidup
-  jamTidur: 5.5, // 5 Jam 30 Menit
-  tekananFinansial: 4,
-  ekspektasiKeluarga: 6,
-  dukunganSosial: 5,
-  aktivitasFisik: 195, // 3 Jam 15 Menit = 195 menit
-}
+import { createAssessment } from '../services/assessmentService'
 
 function Input() {
   const navigate = useNavigate()
   const [step, setStep] = useState(1)
-  const [data, setData] = useState(initialData)
   const [loading, setLoading] = useState(false)
 
-  const handleChange = (field, value) => {
-    setData(prev => ({ ...prev, [field]: value }))
-  }
+  const [formData, setFormData] = useState({
+    stress: 5,
+    anxiety: 5,
+    emotional_pressure: 5,
+
+    academic_pressure: 5,
+    study_hours: 0,
+
+    sleep_hours: 0,
+    financial_pressure: 5,
+    family_expectation: 5,
+    social_support: 5,
+    activity_hours: 0,
+  });
+
 
   const handleNext = () => {
     if (step < 4) setStep(step + 1)
@@ -47,23 +40,21 @@ function Input() {
     else navigate(ROUTES.DASHBOARD)
   }
 
-  const handleSubmit = async () => {
-    setLoading(true)
+  const handleAnalysis = async () => {
     try {
-      // Pastikan aktivitasFisik terkirim sebagai angka murni (menit)
-      const payload = {
-        ...data,
-        aktivitasFisik: Number(data.aktivitasFisik) || 0
-      }
-      await burnoutService.submitInput(payload)
-      navigate(ROUTES.RESULT)
-    } catch (err) {
-      console.error(err)
-      navigate(ROUTES.RESULT) // Fallback jika API sedang error di dev
+      setLoading(true);
+      const result = await createAssessment(formData);
+
+      localStorage.setItem("analysisResult", JSON.stringify(result));
+
+      navigate(`/result/${result.id}`);
+    } catch (error) {
+      console.log(error);
+      alert("Gagal melakukan analisis");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     // Max-w-4xl agar form tidak melebar raksasa di layar desktop
@@ -77,10 +68,10 @@ function Input() {
         
         {/* Area Render Step */}
         <div className="py-2">
-          {step === 1 && <MentalStep    data={data} onChange={handleChange} />}
-          {step === 2 && <AcademicStep  data={data} onChange={handleChange} />}
-          {step === 3 && <LifestyleStep data={data} onChange={handleChange} />}
-          {step === 4 && <ReviewStep    data={data} />}
+          {step === 1 && <MentalStep    formData={formData} setFormData={setFormData} />}
+          {step === 2 && <AcademicStep  formData={formData} setFormData={setFormData} />}
+          {step === 3 && <LifestyleStep formData={formData} setFormData={setFormData} />}
+          {step === 4 && <ReviewStep    formData={formData} />}
         </div>
 
         {/* Footer: Tombol Navigasi (Desain Sesuai Figma) */}
@@ -103,7 +94,7 @@ function Input() {
             </button>
           ) : (
             <button
-              onClick={handleSubmit}
+              onClick={handleAnalysis}
               disabled={loading}
               className="h-11 px-8 bg-blue-800 rounded-[10px] text-white text-base font-medium hover:bg-blue-900 transition-all flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
             >

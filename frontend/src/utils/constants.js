@@ -1,4 +1,6 @@
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
+export const API_BASE_URL =
+import.meta.env.VITE_API_URL ||
+'http://localhost:5000/api/v1'
 
 export const BURNOUT_LEVELS = {
   LOW:    { label: 'Rendah', color: 'text-green-600',  bg: 'bg-green-50',  border: 'border-green-200', dot: 'bg-green-500'  },
@@ -19,6 +21,7 @@ export const ROUTES = {
   DASHBOARD:      '/dashboard',
   INPUT:          '/input',
   RESULT:         '/result',
+  RESULT_DETAIL:  '/result/:id',
   TODO:           '/todo',
   HISTORY:        '/riwayat',
   HISTORY_DETAIL: '/riwayat/:id', // <-- Rute dinamis baru untuk detail riwayat harian

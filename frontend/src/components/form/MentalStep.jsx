@@ -1,7 +1,7 @@
 import React from 'react';
 import Slider from '../ui/Slider';
 
-function MentalStep({ data, onChange }) {
+function MentalStep({ formData, setFormData }) {
   return (
     // Wrapper utama dengan gap yang pas antara judul dan form
     <div className="flex flex-col gap-7 w-full">
@@ -23,8 +23,8 @@ function MentalStep({ data, onChange }) {
         <Slider
           label="Seberapa stres kamu hari ini?"
           hint="Skala 1 (sangat tenang) sampai 10 (sangat stres)"
-          value={data.stres}
-          onChange={v => onChange('stres', v)}
+          value={formData.stress}
+          onChange={v => setFormData({ ...formData, stress: v })}
           min={1} 
           max={10}
           minLabel="Rendah" 
@@ -34,8 +34,8 @@ function MentalStep({ data, onChange }) {
         {/* 2. Kecemasan (Tanpa hint) */}
         <Slider
           label="Seberapa cemas kamu hari ini?"
-          value={data.kecemasan}
-          onChange={v => onChange('kecemasan', v)}
+          value={formData.anxiety}
+          onChange={v => setFormData({ ...formData, anxiety: v })}
           min={1} 
           max={10}
           minLabel="Rendah" 
@@ -45,8 +45,8 @@ function MentalStep({ data, onChange }) {
         {/* 3. Tekanan Emosional (Tanpa hint) */}
         <Slider
           label="Tingkat tekanan emosional saat ini"
-          value={data.depresi} 
-          onChange={v => onChange('depresi', v)}
+          value={formData.emotional_pressure} 
+          onChange={v => setFormData({ ...formData, emotional_pressure: v })}
           min={1} 
           max={10}
           minLabel="Rendah" 

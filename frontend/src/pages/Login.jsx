@@ -5,6 +5,7 @@ import { ROUTES } from '../utils/constants'
 import Input from '../components/ui/Input'
 import Button from '../components/ui/Button'
 import useAuthStore from '../store/auth/useAuthStore'
+import authService from '../services/auth/authService'
 
 function Login() {
   const navigate = useNavigate()
@@ -23,24 +24,28 @@ function Login() {
 
   const handleSubmit = async () => {
     const newErrors = validate()
-    if (Object.keys(newErrors).length > 0) { setErrors(newErrors); return }
-    setLoading(true)
-
-    await new Promise(r => setTimeout(r, 1000))
-
-    const dummyUser = {
-      name:       'Naufal Pratama',
-      email:      form.email,
-      prodi:      'Ilmu Komputer',
-      semester:   '6',
-      university: 'Universitas Indonesia',
-      gender:     'Laki-laki',
-      age:        '21',
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      return
     }
-    useAuthStore.getState().setAuth(dummyUser, 'dummy-token-123')
 
-    setLoading(false)
-    navigate(ROUTES.DASHBOARD)
+    try {
+      setLoading(true)
+      await authService.login({
+        email: form.email,
+        password: form.password
+      })
+      navigate(ROUTES.DASHBOARD)
+    } catch (error) {
+      console.error(error)
+      setErrors({
+        general:
+          error.response?.data?.message ||
+          'Login gagal'
+      })
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleChange = (field, value) => {

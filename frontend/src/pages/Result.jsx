@@ -1,77 +1,77 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Sparkles, Moon, BookOpen, Activity, ArrowRight, RotateCcw, ArrowLeft } from 'lucide-react';
+import { Sparkles, ArrowRight, RotateCcw, ArrowLeft, ListChecks } from 'lucide-react';
 import { ROUTES } from '../utils/constants';
 import ResultCard from '../components/result/ResultCard';
 import FactorBreakdown from '../components/result/FactorBreakdown';
-import RecommendationList from '../components/result/RecommendationList';
-import burnoutService from '../services/burnout/burnoutService';
-
-// Mock list data riwayat untuk simulasi pencarian detail (sebelum disambung full API)
-const MOCK_HISTORY_DETAILS = {
-  "1": {
-    score: 82, mental_health_index: 7.1,
-    ai_insight: 'Analisis 4 Mei 2026: Tingkat stres dan tekanan akademik kamu meningkat signifikan dalam beberapa hari terakhir, yang berkontribusi pada risiko burnout yang lebih tinggi. Fokus pada perbaikan tidur dan istirahat dapat membantu menurunkan skor secara bertahap.',
-    factors: [
-      { label: 'Stres',         value: 85, level: 'Tinggi', color: 'danger'  },
-      { label: 'Tidur',         value: 40, level: 'Rendah', color: 'warning' },
-      { label: 'Beban Belajar', value: 60, level: 'Sedang', color: 'indigo'  },
-    ],
-    recommendations: [
-      { icon: Moon,     title: 'Tingkatkan durasi tidur',      desc: 'Usahakan tidur minimal 7 jam per malam.' },
-      { icon: BookOpen, title: 'Kurangi beban kerja berlebih', desc: 'Bagi tugas menjadi sesi-sesi yang lebih kecil.' },
-      { icon: Activity, title: 'Aktivitas fisik ringan',       desc: 'Jalan santai 15–20 menit setiap hari.' },
-      { icon: Sparkles, title: 'Istirahat secara berkala',     desc: 'Ambil jeda 5 menit setiap 1 jam belajar.' },
-    ],
-  },
-  "2": {
-    score: 78, mental_health_index: 6.8,
-    ai_insight: 'Analisis 3 Mei 2026: Kondisi kelelahan emosional tinggi dikarenakan manajemen waktu belajar yang kurang seimbang. Sempatkan jeda relaksasi.',
-    factors: [
-      { label: 'Stres',         value: 80, level: 'Tinggi', color: 'danger'  },
-      { label: 'Tidur',         value: 45, level: 'Rendah', color: 'warning' },
-      { label: 'Beban Belajar', value: 70, level: 'Tinggi', color: 'danger'  },
-    ],
-    recommendations: [
-      { icon: Sparkles, title: 'Metode Pomodoro',          desc: 'Terapkan belajar 25 menit dan istirahat 5 menit.' },
-      { icon: Moon,     title: 'Hindari begadang beruntun', desc: 'Batasi penggunaan gawai menjelang jam tidur malam.' },
-    ]
-  }
-};
-
-const DUMMY_RESULT = {
-  score: 82,
-  mental_health_index: 7.1,
-  ai_insight: 'Tingkat stres dan tekanan akademik kamu meningkat signifikan dalam beberapa hari terakhir, yang berkontribusi pada risiko burnout yang lebih tinggi. Fokus pada perbaikan tidur dan istirahat dapat membantu menurunkan skor secara bertahap.',
-  factors: [
-    { label: 'Stres',         value: 85, level: 'Tinggi', color: 'danger'  },
-    { label: 'Tidur',         value: 40, level: 'Rendah', color: 'warning' },
-    { label: 'Beban Belajar', value: 60, level: 'Sedang', color: 'indigo'  },
-  ],
-  recommendations: [
-    { icon: Moon,     title: 'Tingkatkan durasi tidur',      desc: 'Usahakan tidur minimal 7 jam per malam.' },
-    { icon: BookOpen, title: 'Kurangi beban kerja berlebih', desc: 'Bagi tugas menjadi sesi-sesi yang lebih kecil.' },
-    { icon: Activity, title: 'Aktivitas fisik ringan',       desc: 'Jalan santai 15–20 menit setiap hari.' },
-    { icon: Sparkles, title: 'Istirahat secara berkala',     desc: 'Ambil jeda 5 menit setiap 1 jam belajar.' },
-  ],
-};
+import { getHistoryDetail } from '../services/historyService';
 
 function Result() {
   const navigate = useNavigate();
-  const { id } = useParams(); // REVISI: Ambil parameter ID dari URL jika diakses via detail riwayat
+  const { id: urlId } = useParams(); 
+  
+  const isDetailMode = !!urlId;
+  const [result, setResult] = useState({});
+  const [todos, setTodos] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Logika Pemilihan Sumber Data: Jika ada parameter ID, cari dari riwayat lama, jika tidak ada pakai hasil baru
-  const isDetailMode = !!id;
-  const result = isDetailMode 
-    ? (MOCK_HISTORY_DETAILS[id] || DUMMY_RESULT) 
-    : (burnoutService.getLastResult() || DUMMY_RESULT);
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        let fetchId = urlId;
+        if (!isDetailMode) {
+           const localData = JSON.parse(localStorage.getItem("analysisResult"));
+           if (localData && localData.id) {
+              fetchId = localData.id;
+           }
+        }
+
+        if (fetchId) {
+           const data = await getHistoryDetail(fetchId);
+           setResult(data.history);
+           setTodos(data.todos || []);
+        }
+      } catch (error) {
+         console.error("Failed to load result:", error);
+      } finally {
+         setLoading(false);
+      }
+    };
+    loadData();
+  }, [urlId, isDetailMode]);
+
+  const getFactorLevel = (val) => {
+    if (!val) return 'Tidak diketahui';
+    if (val >= 7) return 'Tinggi';
+    if (val >= 4) return 'Sedang';
+    return 'Rendah';
+  };
+
+  const getSleepLevel = (val) => {
+    if (!val) return 'Tidak diketahui';
+    if (val < 6) return 'Kurang';
+    if (val <= 8) return 'Cukup';
+    return 'Berlebih';
+  };
+
+  const dominantFactors = [
+    { label: "Stres", level: getFactorLevel(result?.stress) },
+    { label: "Kecemasan", level: getFactorLevel(result?.anxiety) },
+    { label: "Tekanan Akademik", level: getFactorLevel(result?.academic_pressure) },
+    { label: "Tidur", level: getSleepLevel(result?.sleep_hours) }
+  ];
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC]">Memuat data...</div>;
+  }
 
   return (
     <div className="p-6 md:p-10 md:px-20 lg:px-32 bg-[#F8FAFC] min-h-screen flex flex-col gap-6">
       <div className="w-full max-w-5xl mx-auto flex flex-col gap-6">
         
         {/* Kartu Utama */}
-        <ResultCard score={result.score} />
+        <ResultCard score={result?.burnout_score || 0} />
 
         {/* Grid Skor Detail */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -79,49 +79,101 @@ function Result() {
             <div className="mb-6">
               <h3 className="text-lg font-medium text-neutral-950 leading-7 mb-1">Skor Detail</h3>
               <p className="text-sm text-gray-500">
-                {isDetailMode ? 'Metrik tersimpan dari riwayat lama' : 'Metrik utama dari hasil analisis'}
+                Metrik utama dari hasil analisis
               </p>
             </div>
             <div className="flex flex-col gap-4 flex-1">
               <div className="bg-slate-50 rounded-[10px] border-[0.67px] border-gray-200 p-4 flex flex-col gap-1">
                 <span className="text-sm text-gray-500">Skor Burnout</span>
-                <span className="text-3xl font-normal text-neutral-950">{result.score}%</span>
+                <span className="text-3xl font-normal text-neutral-950">{result?.burnout_score || 0}%</span>
               </div>
               <div className="bg-slate-50 rounded-[10px] border-[0.67px] border-gray-200 p-4 flex items-center justify-between">
                 <div className="flex flex-col gap-1">
-                  <span className="text-sm text-gray-500">Indeks Kesehatan Mental</span>
-                  <span className="text-3xl font-normal text-neutral-950">{result.mental_health_index} / 10</span>
+                  <span className="text-sm text-gray-500">Status Burnout</span>
+                  <span className="text-xl font-medium text-neutral-950">Level Saat Ini</span>
                 </div>
-                <div className="px-3 py-1 bg-orange-50 border-[0.67px] border-orange-300 rounded-lg">
-                  <span className="text-xs font-medium text-orange-500">Sedang</span>
+                <div className="px-4 py-2 bg-orange-50 border-[0.67px] border-orange-300 rounded-lg">
+                  <span className="text-sm font-bold text-orange-600">{result?.burnout_level || 'Belum ada'}</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <FactorBreakdown factors={result.factors} />
+          <FactorBreakdown factors={[
+            { label: 'Stres', value: (result?.stress || 0) * 10, level: getFactorLevel(result?.stress), color: 'danger' },
+            { label: 'Kecemasan', value: (result?.anxiety || 0) * 10, level: getFactorLevel(result?.anxiety), color: 'warning' },
+            { label: 'Beban Akademik', value: (result?.academic_pressure || 0) * 10, level: getFactorLevel(result?.academic_pressure), color: 'indigo' },
+          ]} />
         </div>
 
-        {/* Kartu Analisis AI */}
-        <div className="bg-white rounded-2xl border-[0.67px] border-gray-200 p-6 shadow-sm flex flex-col gap-3">
-          <div className="flex items-center gap-2">
+        {/* Faktor Dominan Burnout */}
+        <div className="bg-white rounded-2xl border-[0.67px] border-gray-200 p-6 shadow-sm flex flex-col gap-4">
+          <h3 className="text-lg font-medium text-neutral-950">Faktor Dominan Burnout</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {dominantFactors.map((f, i) => (
+              <div key={i} className="bg-slate-50 p-3 rounded-[10px] border-[0.67px] border-gray-200">
+                <p className="text-xs text-gray-500 mb-1">{f.label}</p>
+                <p className={
+                  `text-sm font-semibold ${f.level === 'Tinggi' || f.level === 'Kurang' ? 'text-red-600' : 'text-neutral-950'}`
+                }>
+                  {f.level}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Todo Generated */}
+        <div className="bg-white rounded-2xl border-[0.67px] border-gray-200 p-6 shadow-sm flex flex-col gap-4">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-8 h-8 rounded-[10px] bg-green-50 flex items-center justify-center">
+              <ListChecks size={16} className="text-green-800" />
+            </div>
+            <h3 className="text-lg font-medium text-neutral-950">To-Do Spesial (Dibuat Otomatis)</h3>
+          </div>
+          <div className="flex flex-col gap-3">
+            {todos.length > 0 ? (
+               todos.map(todo => (
+                 <div key={todo.id} className="p-4 bg-slate-50 border border-slate-200 rounded-[10px] flex items-center gap-4">
+                   <div className="w-5 h-5 rounded-md border-2 border-slate-300 flex-shrink-0" />
+                   <div>
+                     <p className="text-sm font-semibold text-neutral-950">{todo.title}</p>
+                     <p className="text-xs text-gray-500">{todo.description}</p>
+                   </div>
+                 </div>
+               ))
+            ) : (
+               <p className="text-sm text-gray-500 italic p-4 bg-slate-50 rounded-[10px] border border-slate-200">Tidak ada Todo otomatis yang dibuat.</p>
+            )}
+          </div>
+        </div>
+
+        {/* Rekomendasi List - Mapping Array String Langsung dari Backend */}
+        <div className="bg-white rounded-2xl border-[0.67px] border-gray-200 p-6 shadow-sm flex flex-col gap-4">
+          <div className="flex items-center gap-2 mb-2">
             <div className="w-8 h-8 rounded-[10px] bg-blue-50 flex items-center justify-center">
               <Sparkles size={16} className="text-blue-800" />
             </div>
-            <h3 className="text-base font-medium text-blue-800">Analisis AI</h3>
+            <h3 className="text-lg font-medium text-neutral-950">Rekomendasi AI</h3>
           </div>
-          <p className="text-base text-gray-700 leading-relaxed">
-            {result.ai_insight}
-          </p>
+          <div className="flex flex-col gap-3">
+            {result?.recommendation?.length > 0 ? (
+              result.recommendation.map((item, index) => (
+                <div key={index} className="p-4 bg-slate-50 rounded-[10px] border-[0.67px] border-gray-200 text-gray-700 leading-relaxed">
+                  {item}
+                </div>
+              ))
+            ) : (
+              <div className="p-4 bg-slate-50 rounded-[10px] border-[0.67px] border-gray-200 text-gray-500 italic">
+                Belum ada rekomendasi.
+              </div>
+            )}
+          </div>
         </div>
-
-        {/* Rekomendasi List */}
-        <RecommendationList recommendations={result.recommendations} />
 
         {/* Footer Buttons — Kondisional Menyesuaikan Asal Halaman */}
         <div className="flex items-center justify-end gap-4 mt-2">
           {isDetailMode ? (
-            // TAMPILAN FOOTER JIKA DIAKSES DARI DETAIL RIWAYAT
             <button
               onClick={() => navigate(ROUTES.HISTORY)}
               className="h-11 px-6 bg-slate-800 text-white rounded-[10px] text-base font-medium hover:bg-slate-900 transition-colors flex items-center gap-2"
@@ -129,7 +181,6 @@ function Result() {
               <ArrowLeft size={16} /> Kembali ke Riwayat
             </button>
           ) : (
-            // TAMPILAN FOOTER JIKA DIAKSES SETELAH BARU INPUT DATA
             <>
               <button
                 onClick={() => navigate(ROUTES.HISTORY)}

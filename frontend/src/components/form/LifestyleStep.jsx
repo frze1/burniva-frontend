@@ -107,7 +107,7 @@ const TimePickerCard = ({ title, hours, minutes, onTimeChange, displayValue }) =
 // ==========================================
 // KOMPONEN UTAMA: Lifestyle Step
 // ==========================================
-function LifestyleStep({ data, onChange }) {
+function LifestyleStep({ formData, setFormData }) {
   
   // --- FUNGSI FORMATTER UMUM (Dipakai untuk Tidur & Fisik) ---
   const formatTimeDisplay = (h, m) => {
@@ -118,22 +118,22 @@ function LifestyleStep({ data, onChange }) {
   };
 
   // --- KONVERSI DATA: Jam Tidur (Disimpan sebagai Desimal, misal 6.5) ---
-  const hoursTidur = Math.floor(data.jamTidur || 0);
-  const minutesTidur = Math.round(((data.jamTidur || 0) - hoursTidur) * 60);
+  const hoursTidur = Math.floor(formData.sleep_hours || 0);
+  const minutesTidur = Math.round(((formData.sleep_hours || 0) - hoursTidur) * 60);
   
   const handleTidurChange = (h, m) => {
     const decimalValue = h + (m / 60);
-    onChange('jamTidur', Number(decimalValue.toFixed(2)));
+    setFormData({ ...formData, sleep_hours: Number(decimalValue.toFixed(2)) });
   };
 
   // --- KONVERSI DATA: Aktivitas Fisik (Disimpan sebagai Total Menit, misal 195) ---
-  const totalMenitFisik = Number(data.aktivitasFisik) || 0;
+  const totalMenitFisik = Number(formData.activity_hours) || 0;
   const hoursFisik = Math.floor(totalMenitFisik / 60);
   const minutesFisik = totalMenitFisik % 60;
 
   const handleFisikChange = (h, m) => {
     const totalMins = (h * 60) + m;
-    onChange('aktivitasFisik', totalMins);
+    setFormData({ ...formData, activity_hours: totalMins });
   };
 
   return (
@@ -164,8 +164,8 @@ function LifestyleStep({ data, onChange }) {
         {/* 2. Tekanan Finansial (Slider) */}
         <Slider
           label="Seberapa berat tekanan finansial?"
-          value={data.tekananFinansial}
-          onChange={v => onChange('tekananFinansial', v)}
+          value={formData.financial_pressure}
+          onChange={v => setFormData({ ...formData, financial_pressure: v })}
           min={1} 
           max={10}
           minLabel="Rendah" 
@@ -175,8 +175,8 @@ function LifestyleStep({ data, onChange }) {
         {/* 3. Ekspektasi Keluarga (Slider) */}
         <Slider
           label="Seberapa tinggi ekspektasi keluarga?"
-          value={data.ekspektasiKeluarga}
-          onChange={v => onChange('ekspektasiKeluarga', v)}
+          value={formData.family_expectation}
+          onChange={v => setFormData({ ...formData, family_expectation: v })}
           min={1} 
           max={10}
           minLabel="Rendah" 
@@ -186,8 +186,8 @@ function LifestyleStep({ data, onChange }) {
         {/* 4. Dukungan Sosial (Slider) */}
         <Slider
           label="Seberapa besar dukungan sosial yang kamu rasakan?"
-          value={data.dukunganSosial}
-          onChange={v => onChange('dukunganSosial', v)}
+          value={formData.social_support}
+          onChange={v => setFormData({ ...formData, social_support: v })}
           min={1} 
           max={10}
           minLabel="Rendah" 

@@ -46,6 +46,33 @@ function ProfileEdit({
           <Input label="Nama Lengkap" name="nama" value={form.nama} onChange={onUserChange} placeholder="Nama Lengkap" />
           <Input label="Email" name="email" type="email" value={form.email} onChange={onUserChange} placeholder="kamu@kampus.ac.id" />
           
+          {/* Jenis Kelamin */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-slate-700">Jenis Kelamin</label>
+            <select
+              name="jenisKelamin"
+              value={form.jenisKelamin || ''}
+              onChange={onUserChange}
+              className="w-full h-11 text-sm rounded-xl border border-slate-200 bg-white px-4 text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            >
+              <option value="">Pilih Jenis Kelamin</option>
+              <option value="Laki-laki">Laki-laki</option>
+              <option value="Perempuan">Perempuan</option>
+            </select>
+          </div>
+
+          {/* Umur */}
+          <Input label="Umur" name="umur" type="number" value={form.umur} onChange={onUserChange} placeholder="Contoh: 21" />
+
+          {/* Universitas */}
+          <Input label="Universitas" name="universitas" value={form.universitas} onChange={onUserChange} placeholder="Nama Universitas" />
+
+          {/* Program Studi */}
+          <Input label="Program Studi" name="prodi" value={form.prodi} onChange={onUserChange} placeholder="Program Studi / Jurusan" />
+
+          {/* Semester */}
+          <Input label="Semester" name="semester" type="number" value={form.semester} onChange={onUserChange} placeholder="Contoh: 6" />
+          
           {/* AREA EDIT FOTO */}
           <div className="flex flex-col gap-2 mt-1">
             <label className="text-sm font-medium text-gray-700">Foto Profil</label>

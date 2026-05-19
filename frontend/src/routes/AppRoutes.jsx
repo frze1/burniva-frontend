@@ -36,6 +36,7 @@ function AppRoutes() {
             <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />
             <Route path={ROUTES.INPUT}     element={<Input />}     />
             <Route path={ROUTES.RESULT}    element={<Result />}    />
+            <Route path={ROUTES.RESULT_DETAIL} element={<Result />} />
             <Route path={ROUTES.TODO}      element={<Todo />}      />
             <Route path={ROUTES.HISTORY}   element={<History />}   />
             <Route path={ROUTES.HISTORY_DETAIL} element={<Result />} />

@@ -1,19 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Pencil, X, Save } from 'lucide-react';
 import ProfileView from '../components/profile/ProfileView';
 import ProfileEdit from '../components/profile/ProfileEdit';
-
-const DUMMY_USER = {
-  nama: 'Naufal Pratama',
-  email: 'naufal@kampus.ac.id',
-  photoUrl: null // Nanti URL foto dari backend
-};
+import useAuthStore from '../store/auth/useAuthStore';
+import authService from '../services/auth/authService';
 
 function Profile() {
-  const [user, setUser] = useState(DUMMY_USER);
-  const [form, setForm] = useState(DUMMY_USER);
+  const authUser = useAuthStore((state) => state.user);
+
+  const initialUser = {
+    nama: authUser?.name || '',
+    email: authUser?.email || '',
+    jenisKelamin: authUser?.gender || '',
+    umur: authUser?.age || '',
+    universitas: authUser?.university || '',
+    prodi: authUser?.major || '',
+    semester: authUser?.semester || '',
+    photoUrl: authUser?.profile_image || null,
+  };
+
+  const [user, setUser] = useState(initialUser);
+  const [form, setForm] = useState(initialUser);
   const [isEdit, setIsEdit] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchFreshProfile = async () => {
+      try {
+        const freshUser = await authService.getProfile();
+        const newUser = {
+          nama: freshUser.name || '',
+          email: freshUser.email || '',
+          jenisKelamin: freshUser.gender || '',
+          umur: freshUser.age || '',
+          universitas: freshUser.university || '',
+          prodi: freshUser.major || '',
+          semester: freshUser.semester || '',
+          photoUrl: freshUser.profile_image || null,
+        };
+        setUser(newUser);
+        setForm(newUser);
+      } catch (err) {
+        console.error("Gagal mengambil data profil terbaru:", err);
+      }
+    };
+    fetchFreshProfile();
+  }, []);
 
   // --- STATE KHUSUS FOTO PROFIL ---
   const [previewImage, setPreviewImage] = useState(null); // URL Base64 untuk preview
@@ -31,23 +63,84 @@ function Profile() {
   };
 
   const handleSave = async () => {
-    setLoading(true);
-    
-    // Nanti di sini kamu akan mengirim imageFile menggunakan FormData ke API
-    console.log("File gambar yang akan diunggah:", imageFile);
-    
-    await new Promise(r => setTimeout(r, 800)); // Simulasi API
 
-    // Update data lokal (setelah berhasil upload)
-    setUser({ 
-      ...form, 
-      photoUrl: previewImage || user.photoUrl // Update foto utama jika ada preview baru
-    }); 
-    
-    setLoading(false);
-    setIsEdit(false);
-    setPreviewImage(null);
-    setImageFile(null);
+    try {
+
+      setLoading(true);
+
+      const updatedData = {
+        name: form.nama,
+        email: form.email,
+        gender: form.jenisKelamin,
+        age: form.umur,
+        university: form.universitas,
+        major: form.prodi,
+        semester: form.semester,
+        profile_image: previewImage || user.photoUrl
+      };
+
+      const res =
+        await authService
+        .updateProfile(
+          updatedData
+        );
+
+      const updatedUser = res;
+
+      const newUser = {
+        nama:
+          updatedUser.name,
+
+        email:
+          updatedUser.email,
+
+        jenisKelamin:
+          updatedUser.gender,
+
+        umur:
+          updatedUser.age,
+
+        universitas:
+          updatedUser.university,
+
+        prodi:
+          updatedUser.major,
+
+        semester:
+          updatedUser.semester,
+
+        photoUrl:
+          updatedUser.profile_image
+      };
+
+      setUser(newUser);
+      setForm(newUser);
+
+      setIsEdit(false);
+
+      setPreviewImage(
+        null
+      );
+
+      setImageFile(
+        null
+      );
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert(
+        error.response?.data?.message ||
+        "Gagal update profile"
+      );
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
   };
 
   const handleCancel = () => {

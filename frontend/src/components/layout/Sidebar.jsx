@@ -6,6 +6,7 @@ import {
 } from 'lucide-react'
 import { ROUTES } from '../../utils/constants'
 import { classNames } from '../../utils/helpers'
+import useAuthStore from '../../store/auth/useAuthStore'
 
 const navItems = [
   { label: 'Dashboard',  icon: LayoutDashboard, path: ROUTES.DASHBOARD },
@@ -20,7 +21,7 @@ function Sidebar({ isOpen, onClose }) {
   const [showLogoutModal, setShowLogoutModal] = useState(false)
 
   const handleLogout = () => {
-    localStorage.removeItem('token')
+    useAuthStore.getState().clearAuth()
     navigate(ROUTES.LOGIN)
   }
 

@@ -4,28 +4,49 @@ import {
   ResponsiveContainer
 } from 'recharts'
 
-const stressData = [
-  { day: 'Sen', value: 3 }, { day: 'Sel', value: 3.5 }, { day: 'Rab', value: 2.8 },
-  { day: 'Kam', value: 4 }, { day: 'Jum', value: 6 }, { day: 'Sab', value: 7.5 }, { day: 'Min', value: 7 },
-]
-
-const burnoutData = [
-  { week: 'M-4', value: 48 }, { week: 'M-3', value: 58 }, { week: 'M-2', value: 68 },
-  { week: 'M-1', value: 75 }, { week: 'Skrg', value: 82 },
-]
-
-const avg = (stressData.reduce((s, d) => s + d.value, 0) / stressData.length).toFixed(1)
-const latest = burnoutData[burnoutData.length - 1].value
-const prev = burnoutData[burnoutData.length - 2].value
-const diff = latest - prev
-const diffPct = Math.round((diff / prev) * 100)
-
 const tooltipStyle = {
   contentStyle: { borderRadius: '10px', border: '1px solid #E5E7EB', fontSize: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' },
   cursor: { stroke: '#E5E7EB' },
 }
 
-function ChartSection() {
+function ChartSection({ trendData = [] }) {
+  // Mapping trendData dari API ke format Recharts (M-1, M-2 dst sesuai instruksi)
+  const burnoutData = trendData.length > 0 
+    ? trendData.map((item, index) => ({
+        day: `M-${index + 1}`,
+        score: item.score
+      }))
+    : [
+        { day: 'M-4', score: 48 }, { day: 'M-3', score: 58 }, { day: 'M-2', score: 68 },
+        { day: 'M-1', score: 75 }, { day: 'Skrg', score: 82 },
+      ]; // Fallback dummy
+
+  // Mapping stressData dinamis dari trendData jika ada
+  const stressData = trendData.length > 0
+    ? trendData.slice(-7).map(item => ({
+        day: new Date(item.date).toLocaleDateString('id-ID', { weekday: 'short' }),
+        value: item.stress || 0
+      }))
+    : [
+        { day: 'Sen', value: 3 }, { day: 'Sel', value: 3.5 }, { day: 'Rab', value: 2.8 },
+        { day: 'Kam', value: 4 }, { day: 'Jum', value: 6 }, { day: 'Sab', value: 7.5 }, { day: 'Min', value: 7 },
+      ];
+
+  const avg = (stressData.reduce((s, d) => s + d.value, 0) / stressData.length).toFixed(1);
+
+  let diff = 0;
+  let diffPct = 0;
+  
+  if (burnoutData.length >= 2) {
+    const latestValue = burnoutData[burnoutData.length - 1].score;
+    const prevValue = burnoutData[burnoutData.length - 2].score;
+    diff = latestValue - prevValue;
+    diffPct = prevValue > 0 ? Math.round((diff / prevValue) * 100) : 0;
+  } else if (burnoutData.length === 1) {
+    diff = burnoutData[0].score;
+    diffPct = 100;
+  }
+
   return (
     <div className="flex flex-col gap-6">
 
@@ -41,7 +62,13 @@ function ChartSection() {
           </div>
         </div>
 
-        <div className="h-64 w-full">
+        <div className="h-64 w-full relative">
+          {trendData.length === 0 && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/70 backdrop-blur-[1.5px] z-10 text-center p-4">
+              <span className="text-sm font-semibold text-slate-500 italic">Menampilkan data simulasi</span>
+              <span className="text-xs text-slate-400">Silakan isi data asesmen harian Anda hari ini!</span>
+            </div>
+          )}
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={stressData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
               <defs>
@@ -65,24 +92,32 @@ function ChartSection() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-2">
           <div>
             <h3 className="text-lg font-semibold text-slate-800">Perkembangan Burnout</h3>
-            <p className="text-sm text-gray-500">Tren 5 minggu terakhir</p>
+            <p className="text-sm text-gray-500">Tren berdasarkan riwayat analisis</p>
           </div>
-          <div className="bg-red-50 border-[0.67px] border-red-100 rounded-full px-3 py-1.5 self-start sm:self-auto flex items-center gap-2">
-             <div className="w-3 h-3 rounded-full bg-red-600 outline outline-1 outline-red-300" />
-            <span className="text-sm font-medium text-red-600">
-              {diff > 0 ? '+' : ''}{diffPct}%
-            </span>
-          </div>
+          {burnoutData.length > 0 && (
+            <div className={`border-[0.67px] rounded-full px-3 py-1.5 self-start sm:self-auto flex items-center gap-2 ${diff > 0 ? 'bg-red-50 border-red-100' : 'bg-green-50 border-green-100'}`}>
+               <div className={`w-3 h-3 rounded-full outline outline-1 ${diff > 0 ? 'bg-red-600 outline-red-300' : 'bg-green-600 outline-green-300'}`} />
+              <span className={`text-sm font-medium ${diff > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                {diff > 0 ? '+' : ''}{diffPct}%
+              </span>
+            </div>
+          )}
         </div>
 
-        <div className="h-56 w-full">
+        <div className="h-56 w-full relative">
+          {trendData.length === 0 && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/70 backdrop-blur-[1.5px] z-10 text-center p-4">
+              <span className="text-sm font-semibold text-slate-500 italic">Menampilkan data simulasi</span>
+              <span className="text-xs text-slate-400">Silakan isi data asesmen harian Anda hari ini!</span>
+            </div>
+          )}
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={burnoutData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
-              <XAxis dataKey="week" tick={{ fontSize: 12, fill: '#9CA3AF' }} axisLine={false} tickLine={false} />
+              <XAxis dataKey="day" tick={{ fontSize: 12, fill: '#9CA3AF' }} axisLine={false} tickLine={false} />
               <YAxis domain={[0, 100]} tick={{ fontSize: 12, fill: '#9CA3AF' }} axisLine={false} tickLine={false} ticks={[0, 25, 50, 75, 100]} />
               <Tooltip {...tooltipStyle} formatter={v => [`${v}%`, 'Burnout']} />
-              <Line type="monotone" dataKey="value" stroke="#8b5cf6" strokeWidth={3} dot={{ fill: '#8b5cf6', r: 5, strokeWidth: 0 }} activeDot={{ r: 7 }} />
+              <Line type="monotone" dataKey="score" stroke="#8b5cf6" strokeWidth={3} dot={{ fill: '#8b5cf6', r: 5, strokeWidth: 0 }} activeDot={{ r: 7 }} />
             </LineChart>
           </ResponsiveContainer>
         </div>

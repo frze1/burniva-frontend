@@ -1,11 +1,10 @@
 import { useNavigate } from 'react-router-dom'
 import { Calendar, ArrowRight } from 'lucide-react'
-import { ROUTES, getBurnoutLevel } from '../../utils/constants'
+import { ROUTES } from '../../utils/constants'
 import { getTodayString } from '../../utils/helpers'
 
-function BurnoutCard({ score = 82, insight = 'Kondisimu saat ini menunjukkan tanda-tanda kelelahan. Ingat, mengambil jeda bukan berarti kamu berhenti. Yuk, pantau terus kesejahteraan mentalmu!' }) {
+function BurnoutCard({ score = 0, levelStr = 'Belum ada', insight = 'Kondisimu saat ini menunjukkan tanda-tanda kelelahan. Ingat, mengambil jeda bukan berarti kamu berhenti. Yuk, pantau terus kesejahteraan mentalmu!', userName = '' }) {
   const navigate = useNavigate()
-  const level = getBurnoutLevel(score)
   const today = getTodayString()
 
   return (
@@ -23,9 +22,14 @@ function BurnoutCard({ score = 82, insight = 'Kondisimu saat ini menunjukkan tan
             <Calendar size={14} />
             <span>Hari Ini, {today}</span>
           </div>
-          <h2 className="text-3xl md:text-4xl font-semibold leading-tight">
-            Halo, Senang Bertemu Kamu!
-          </h2>
+          <div className="flex flex-col gap-1">
+            <h2 className="text-3xl md:text-4xl font-semibold leading-tight">
+              Halo, {userName || 'User'} 👋
+            </h2>
+            <p className="text-blue-200 text-base font-medium">
+              Mari cek kondisi mental kamu hari ini
+            </p>
+          </div>
           <p className="text-blue-100 text-base leading-relaxed">
             {insight}
           </p>
@@ -50,7 +54,7 @@ function BurnoutCard({ score = 82, insight = 'Kondisimu saat ini menunjukkan tan
             <span className="text-blue-200 text-xs font-semibold uppercase tracking-wide mb-2">Status Saat Ini</span>
             <div className="bg-red-500/20 px-3 py-1.5 rounded-full border border-red-400/30 flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-red-100 outline outline-1 outline-red-300" />
-              <span className="text-red-100 text-sm font-medium whitespace-nowrap">Risiko {level?.label || 'Tinggi'}</span>
+              <span className="text-red-100 text-sm font-medium whitespace-nowrap">{levelStr}</span>
             </div>
           </div>
 

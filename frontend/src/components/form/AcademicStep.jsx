@@ -1,11 +1,11 @@
 import React from 'react';
 import Slider from '../ui/Slider';
 
-function AcademicStep({ data, onChange }) {
+function AcademicStep({ formData, setFormData }) {
   // --- LOGIKA KONVERSI WAKTU ---
   // Mengubah data desimal (misal: 6.5) menjadi jam (6) dan menit (30)
-  const hours = Math.floor(data.jamBelajar || 0);
-  const minutes = Math.round(((data.jamBelajar || 0) - hours) * 60);
+  const hours = Math.floor(formData.study_hours || 0);
+  const minutes = Math.round(((formData.study_hours || 0) - hours) * 60);
 
   const handleTimeChange = (newHours, newMinutes) => {
     let h = isNaN(newHours) ? 0 : newHours;
@@ -27,7 +27,7 @@ function AcademicStep({ data, onChange }) {
 
     // Kembalikan ke format desimal untuk disimpan (contoh: 1 jam 15 menit -> 1.25)
     const decimalValue = h + (m / 60);
-    onChange('jamBelajar', Number(decimalValue.toFixed(2)));
+    setFormData({ ...formData, study_hours: Number(decimalValue.toFixed(2)) });
   };
 
   // Format teks untuk kotak nilai biru di kanan atas
@@ -57,8 +57,8 @@ function AcademicStep({ data, onChange }) {
         {/* 1. Tekanan Akademik (Tetap menggunakan Slider) */}
         <Slider
           label="Seberapa besar tekanan akademik?"
-          value={data.tekananAkademik}
-          onChange={v => onChange('tekananAkademik', v)}
+          value={formData.academic_pressure}
+          onChange={v => setFormData({ ...formData, academic_pressure: v })}
           min={1} 
           max={10}
           minLabel="Rendah" 

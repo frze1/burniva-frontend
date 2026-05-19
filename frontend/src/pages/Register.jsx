@@ -53,7 +53,8 @@ function Register() {
       await authService.register({
         nama: form.nama,
         email: form.email,
-        password: form.password
+        password: form.password,
+        confirmPassword: form.confirmPassword
       })
       navigate(ROUTES.LOGIN)
     } catch (err) {

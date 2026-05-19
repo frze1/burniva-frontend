@@ -14,7 +14,7 @@ function ReviewItem({ label, value }) {
   );
 }
 
-function ReviewStep({ data }) {
+function ReviewStep({ formData }) {
   // --- REVISI UTAMA: FUNGSI FORMATTER WAKTU (JAM & MENIT) ---
   
   // 1. Mengubah angka Desimal ke format "X jam Y menit" (Untuk Belajar & Tidur)
@@ -41,16 +41,16 @@ function ReviewStep({ data }) {
 
   // --- MAPPING DATA KE LABEL ---
   const items = [
-    { label: 'Stres',               value: data.stres },
-    { label: 'Kecemasan',           value: data.kecemasan },
-    { label: 'Tekanan Emosional',   value: data.depresi || data.tekananEmosional || 0 }, 
-    { label: 'Tekanan Akademik',    value: data.tekananAkademik },
-    { label: 'Lama Belajar',        value: formatDecimalToHoursMinutes(data.jamBelajar || data.lamaBelajar) },
-    { label: 'Lama Tidur',          value: formatDecimalToHoursMinutes(data.jamTidur || data.lamaTidur) },
-    { label: 'Tekanan Finansial',   value: data.tekananFinansial },
-    { label: 'Ekspektasi Keluarga', value: data.ekspektasiKeluarga },
-    { label: 'Dukungan Sosial',     value: data.dukunganSosial },
-    { label: 'Aktivitas Fisik',      value: formatMinutesToHoursMinutes(data.aktivitasFisik) },
+    { label: 'Stres',               value: formData.stress },
+    { label: 'Kecemasan',           value: formData.anxiety },
+    { label: 'Tekanan Emosional',   value: formData.emotional_pressure }, 
+    { label: 'Tekanan Akademik',    value: formData.academic_pressure },
+    { label: 'Lama Belajar',        value: formatDecimalToHoursMinutes(formData.study_hours) },
+    { label: 'Lama Tidur',          value: formatDecimalToHoursMinutes(formData.sleep_hours) },
+    { label: 'Tekanan Finansial',   value: formData.financial_pressure },
+    { label: 'Ekspektasi Keluarga', value: formData.family_expectation },
+    { label: 'Dukungan Sosial',     value: formData.social_support },
+    { label: 'Aktivitas Fisik',     value: formatMinutesToHoursMinutes(formData.activity_hours) },
   ];
 
   return (
