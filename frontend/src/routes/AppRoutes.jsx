@@ -18,7 +18,7 @@ import History from '../pages/History'
 import Profile from '../pages/Profile'
 
 // Admin
-import AdminLayout from '../components/layout/admin/adminLayout'
+import AdminLayout from '../components/layout/admin/AdminLayout'
 import DashboardAdmin from '../pages/admin/DashboardAdmin'
 import PenggunaAdmin from '../pages/admin/PenggunaAdmin'
 import MonitoringAdmin from '../pages/admin/MonitoringAdmin'
