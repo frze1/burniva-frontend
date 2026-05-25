@@ -151,8 +151,8 @@ function Result() {
         {/* Rekomendasi List - Mapping Array String Langsung dari Backend */}
         <div className="bg-white rounded-2xl border-[0.67px] border-gray-200 p-6 shadow-sm flex flex-col gap-4">
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 rounded-[10px] bg-blue-50 flex items-center justify-center">
-              <Sparkles size={16} className="text-blue-800" />
+            <div className="w-8 h-8 rounded-[10px] bg-primary-50 flex items-center justify-center">
+              <Sparkles size={16} className="text-primary-500" />
             </div>
             <h3 className="text-lg font-medium text-neutral-950">Rekomendasi AI</h3>
           </div>
@@ -190,7 +190,7 @@ function Result() {
               </button>
               <button
                 onClick={() => navigate(ROUTES.INPUT)}
-                className="h-11 px-6 bg-blue-800 rounded-[10px] text-white text-base font-medium hover:bg-blue-900 transition-colors flex items-center gap-2"
+                className="h-11 px-6 bg-primary-500 rounded-[10px] text-white text-base font-medium hover:bg-primary-600 transition-colors flex items-center gap-2"
               >
                 <RotateCcw size={16} /> Input Lagi
               </button>

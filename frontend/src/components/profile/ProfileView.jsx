@@ -3,8 +3,8 @@ import { User, Mail, GraduationCap, Calendar, BookOpen, Heart } from 'lucide-rea
 function InfoItem({ icon: Icon, label, value, hideBorder }) {
   return (
     <div className={`flex items-center gap-4 py-4 ${!hideBorder ? 'border-b-[0.67px] border-gray-100' : ''}`}>
-      <div className="w-10 h-10 rounded-[10px] bg-blue-50 flex items-center justify-center flex-shrink-0">
-        <Icon size={18} className="text-blue-800" />
+      <div className="w-10 h-10 rounded-[10px] bg-primary-50 flex items-center justify-center flex-shrink-0">
+        <Icon size={18} className="text-primary-500" />
       </div>
       <div className="flex flex-col gap-0.5">
         <span className="text-sm text-gray-500 font-normal">{label}</span>

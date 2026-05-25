@@ -1,4 +1,3 @@
-// 1. Import gambar dari folder assets (Sesuaikan path dan nama file-nya)
 import dashboardImg from '../../assets/dash-preview.png';
 import inputImg from '../../assets/input-preview.png';
 import riwayatImg from '../../assets/history-preview.png';
@@ -8,7 +7,7 @@ function PreviewSection() {
     {
       title: 'Dashboard',
       desc: 'Pantau skor burnout dan tren stres harian',
-      image: dashboardImg, // 2. Tambahkan properti image
+      image: dashboardImg,
     },
     {
       title: 'Input Data',
@@ -24,9 +23,8 @@ function PreviewSection() {
 
   return (
     <section className="py-20 bg-slate-50">
-      <div className="max-w-6xl mx-auto px-4 md:px-6">
+      <div className="w-full px-6 sm:px-10 md:px-16 lg:px-24">
 
-        {/* Header */}
         <div className="text-center mb-12">
           <p className="text-sm font-medium text-blue-600 mb-2">Pratinjau</p>
           <h2 className="text-3xl md:text-4xl font-bold text-slate-800">
@@ -34,22 +32,20 @@ function PreviewSection() {
           </h2>
         </div>
 
-        {/* Preview Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {previews.map(({ title, desc, image }) => (
             <div
               key={title}
               className="rounded-2xl overflow-hidden shadow-lg group hover:-translate-y-1 transition-all duration-300 bg-white border border-slate-100"
             >
-              {/* 3. Ganti div gradient dengan tag img */}
               <div className="h-52 w-full overflow-hidden bg-slate-100">
-                <img 
-                  src={image} 
-                  alt={`Tampilan halaman ${title}`} 
+                <img
+                  src={image}
+                  alt={`Tampilan halaman ${title}`}
                   className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
                 />
               </div>
-              
+
               <div className="bg-white px-5 py-4 border-t border-slate-100">
                 <p className="text-sm font-bold text-slate-800">{title}</p>
                 <p className="text-xs text-slate-500 mt-1">{desc}</p>

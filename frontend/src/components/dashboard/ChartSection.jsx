@@ -73,15 +73,15 @@ function ChartSection({ trendData = [] }) {
             <AreaChart data={stressData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="stressGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#1e40af" stopOpacity={0.2} />
-                  <stop offset="95%" stopColor="#1e40af" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#006D5B" stopOpacity={0.2} />
+                  <stop offset="95%" stopColor="#006D5B" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
               <XAxis dataKey="day" tick={{ fontSize: 12, fill: '#9CA3AF' }} axisLine={false} tickLine={false} />
               <YAxis domain={[0, 10]} tick={{ fontSize: 12, fill: '#9CA3AF' }} axisLine={false} tickLine={false} ticks={[0, 3, 6, 10]} />
               <Tooltip {...tooltipStyle} formatter={v => [`${v}`, 'Stres']} />
-              <Area type="monotone" dataKey="value" stroke="#1e40af" strokeWidth={3} fill="url(#stressGrad)" dot={false} activeDot={{ r: 5, fill: '#1e40af' }} />
+              <Area type="monotone" dataKey="value" stroke="#006D5B" strokeWidth={3} fill="url(#stressGrad)" dot={false} activeDot={{ r: 5, fill: '#006D5B' }} />
             </AreaChart>
           </ResponsiveContainer>
         </div>

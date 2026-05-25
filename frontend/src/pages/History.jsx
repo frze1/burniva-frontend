@@ -11,9 +11,9 @@ import { classNames } from '../utils/helpers'
 import { getHistory } from '../services/historyService'
 
 const levelConfig = {
-  Tinggi: { color: 'text-red-500',    bg: 'bg-red-50'    },
+  Tinggi: { color: 'text-red-500', bg: 'bg-red-50' },
   Sedang: { color: 'text-yellow-600', bg: 'bg-yellow-50' },
-  Rendah: { color: 'text-green-600',  bg: 'bg-green-50'  },
+  Rendah: { color: 'text-green-600', bg: 'bg-green-50' },
 }
 
 const CustomDot = (props) => {
@@ -79,7 +79,7 @@ function History() {
                 formatter={v => [`${v}%`, 'Skor Burnout']}
                 cursor={{ stroke: '#E5E7EB' }}
               />
-              <Line type="monotone" dataKey="value" stroke="#1A58B7" strokeWidth={2.5} dot={<CustomDot />} activeDot={{ r: 7, fill: '#1A58B7', stroke: 'white', strokeWidth: 2 }} />
+              <Line type="monotone" dataKey="value" stroke="#006D5B" strokeWidth={2.5} dot={<CustomDot />} activeDot={{ r: 7, fill: '#006D5B', stroke: 'white', strokeWidth: 2 }} />
             </LineChart>
           </ResponsiveContainer>
         )}
@@ -132,7 +132,7 @@ function History() {
                 <p className="text-xs text-slate-400 mb-4">Mulai input data harian untuk melihat perkembangan kamu</p>
                 <button
                   onClick={() => navigate(ROUTES.INPUT)}
-                  className="h-9 px-4 bg-blue-800 text-white text-xs font-semibold rounded-xl hover:bg-blue-900 transition-all"
+                  className="h-9 px-4 bg-primary-500 text-white text-xs font-semibold rounded-xl hover:bg-primary-700 transition-all"
                 >
                   Input Sekarang
                 </button>

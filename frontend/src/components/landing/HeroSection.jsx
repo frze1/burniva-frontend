@@ -11,18 +11,18 @@ import {
 import { ROUTES } from '../../utils/constants'
 import Button from '../ui/Button'
 
-import hero1 from '../../assets/illustrations/hero-1.png'
-import hero2 from '../../assets/illustrations/hero-2.png'
-import hero3 from '../../assets/illustrations/hero-3.png'
-import hero4 from '../../assets/illustrations/hero-4.png'
+import hero1 from '../../assets/illustrations/hero-1.webp'
+import hero2 from '../../assets/illustrations/hero-2.webp'
+import hero3 from '../../assets/illustrations/hero-3.webp'
+import hero4 from '../../assets/illustrations/hero-4.webp'
 
 const SLIDES = [
   {
     id: 1,
     title: (
       <>
-        Pantau Kesehatan Mental,{' '}
-        <span className="text-primary-600">Cegah Burnout Sejak Dini</span>
+        Pantau Kesehatan Mental, Cegah{' '}
+        <span className="text-accent-600">Burnout</span> Sejak Dini
       </>
     ),
     desc: 'BURNIVA adalah platform berbasis AI yang membantu mahasiswa memantau kondisi mental harian, mendeteksi risiko burnout sejak dini, dan memberikan rekomendasi yang dipersonalisasi.',
@@ -33,7 +33,7 @@ const SLIDES = [
     title: (
       <>
         Catat Aktivitas Harian dengan{' '}
-        <span className="text-primary-600">Cara yang Sederhana</span>
+        <span className="text-accent-600">Cara yang Sederhana</span>
       </>
     ),
     desc: 'Pantau jam tidur, mood, stres, dan kebiasaan belajar dalam satu dashboard yang mudah digunakan setiap hari.',
@@ -43,8 +43,8 @@ const SLIDES = [
     id: 3,
     title: (
       <>
-        AI Menganalisis Kondisi Mentalmu secara{' '}
-        <span className="text-primary-600">Real-Time</span>
+        <span className="text-accent-600">AI</span> Menganalisis Kondisi Mentalmu secara{' '}
+        <span className="text-accent-600">Real-Time</span>
       </>
     ),
     desc: 'Model AI mengevaluasi pola aktivitas dan memberikan prediksi tingkat risiko burnout secara otomatis berdasarkan data harianmu.',
@@ -55,7 +55,7 @@ const SLIDES = [
     title: (
       <>
         Dapatkan Insight dan{' '}
-        <span className="text-primary-600">Rekomendasi Personal</span>
+        <span className="text-accent-600">Rekomendasi Personal</span>
       </>
     ),
     desc: 'Terima saran kebiasaan sehat, pengaturan waktu belajar, dan pola istirahat berdasarkan kondisi mental serta beban akademikmu.',
@@ -65,26 +65,26 @@ const SLIDES = [
 
 const COUNT = SLIDES.length
 
-// Extended: [last, ...original, first] — satu clone di tiap ujung
 const EXTENDED_SLIDES = [SLIDES[COUNT - 1], ...SLIDES, SLIDES[0]]
 
 function HeroSection() {
   const navigate = useNavigate()
-
-  // index di dalam EXTENDED_SLIDES; 1..COUNT adalah slide asli
   const [index, setIndex] = useState(1)
   const [animated, setAnimated] = useState(true)
   const isJumping = useRef(false)
   const touchStartX = useRef(null)
   const autoplayRef = useRef(null)
 
-  // -- helpers --
-
   const startAutoplay = useCallback(() => {
     clearInterval(autoplayRef.current)
     autoplayRef.current = setInterval(() => {
-      setAnimated(true)
-      setIndex((prev) => prev + 1)
+      if (document.visibilityState === 'hidden' || document.hidden) return;
+
+      setIndex((prev) => {
+        if (prev >= EXTENDED_SLIDES.length - 1) return prev;
+        setAnimated(true);
+        return prev + 1;
+      })
     }, 6000)
   }, [])
 
@@ -93,24 +93,20 @@ function HeroSection() {
     return () => clearInterval(autoplayRef.current)
   }, [startAutoplay])
 
-  // Setelah transisi selesai, kalau posisi kita di klon, lompat tanpa animasi
   const handleTransitionEnd = useCallback(() => {
     if (isJumping.current) return
 
     if (index === EXTENDED_SLIDES.length - 1) {
-      // klon awal (paling kanan) → lompat ke slide pertama asli
       isJumping.current = true
       setAnimated(false)
       setIndex(1)
     } else if (index === 0) {
-      // klon akhir (paling kiri) → lompat ke slide terakhir asli
       isJumping.current = true
       setAnimated(false)
       setIndex(COUNT)
     }
   }, [index])
 
-  // Setelah jump (animated=false), aktifkan lagi animasi di frame berikutnya
   useEffect(() => {
     if (!animated && isJumping.current) {
       const id = requestAnimationFrame(() => {
@@ -125,29 +121,24 @@ function HeroSection() {
 
   const goNext = useCallback(() => {
     if (isJumping.current) return
-    setAnimated(true)
-    setIndex((prev) => prev + 1)
+    setIndex((prev) => {
+      if (prev >= EXTENDED_SLIDES.length - 1) return prev;
+      setAnimated(true)
+      return prev + 1
+    })
     startAutoplay()
   }, [startAutoplay])
 
   const goPrev = useCallback(() => {
     if (isJumping.current) return
-    setAnimated(true)
-    setIndex((prev) => prev - 1)
+    setIndex((prev) => {
+      if (prev <= 0) return prev;
+      setAnimated(true)
+      return prev - 1
+    })
     startAutoplay()
   }, [startAutoplay])
 
-  const goTo = useCallback((i) => {
-    if (isJumping.current) return
-    setAnimated(true)
-    setIndex(i + 1) // i adalah 0-based dari SLIDES
-    startAutoplay()
-  }, [startAutoplay])
-
-  // dot aktif: index 1..COUNT → 0..COUNT-1
-  const activeDot = index <= 0 ? COUNT - 1 : index >= EXTENDED_SLIDES.length - 1 ? 0 : index - 1
-
-  // touch
   const onTouchStart = (e) => { touchStartX.current = e.targetTouches[0].clientX }
   const onTouchEnd = (e) => {
     if (touchStartX.current === null) return
@@ -164,16 +155,15 @@ function HeroSection() {
   return (
     <section
       id="beranda"
-      className="relative overflow-hidden bg-white"
+      className="relative overflow-hidden bg-white w-full h-[220px] sm:h-[300px] md:h-[calc(100svh-64px)] mt-16"
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
-      {/* Track */}
       <div
-        className="flex"
+        className="flex h-full"
         style={{
           transform: `translateX(-${index * 100}%)`,
-          transition: animated ? 'transform 700ms cubic-bezier(0.4,0,0.2,1)' : 'none',
+          transition: animated ? 'transform 350ms ease-out' : 'none',
           willChange: 'transform',
         }}
         onTransitionEnd={handleTransitionEnd}
@@ -181,110 +171,89 @@ function HeroSection() {
         {EXTENDED_SLIDES.map((slide, i) => (
           <div
             key={`${slide.id}-${i}`}
-            className="min-w-full relative overflow-hidden bg-white"
-            style={{ minHeight: 'min(560px, calc(100svh - 64px))' }}
+            className="min-w-full h-full relative overflow-hidden bg-white"
           >
-            {/* Background ilustrasi — desktop */}
-            <div className="absolute inset-0 hidden md:flex justify-center">
-              <div className="w-full max-w-7xl mx-auto px-6 md:px-10 lg:px-12 xl:px-16 relative">
-                <div className="absolute inset-y-0 right-6 md:right-10 lg:right-12 xl:right-16 w-[64%] lg:w-[68%]">
-                  <img
-                    src={slide.image}
-                    alt={`Ilustrasi ${slide.id}`}
-                    className="w-full h-full object-cover object-left"
-                  />
-                  <div
-                    className="absolute inset-0"
-                    style={{
-                      background:
-                        'linear-gradient(to right, white 25%, rgba(255,255,255,0.55) 50%, transparent 98%)',
-                    }}
-                  />
-                </div>
-              </div>
+            <div className="absolute inset-0 w-full h-full">
+              <img
+                src={slide.image}
+                alt={`Ilustrasi ${slide.id}`}
+                className="w-full h-full object-cover object-[70%_center] md:object-right"
+              />
+
+              <div
+                className="absolute inset-0 w-full h-full md:hidden"
+                style={{ background: 'linear-gradient(to right, #FFFFFF 0%, #FFFFFF 45%, rgba(255,255,255,0) 75%)' }}
+              />
+
+              <div
+                className="absolute inset-0 w-full h-full hidden md:block"
+                style={{ background: 'linear-gradient(to right, #FFFFFF 0%, #FFFFFF 35%, rgba(255,255,255,0) 60%)' }}
+              />
             </div>
 
-            {/* Konten */}
-            <div className="relative max-w-7xl mx-auto px-6 md:px-10 lg:px-12 xl:px-16 flex flex-col justify-center py-16 md:py-20" style={{ minHeight: 'min(560px, calc(100svh - 64px))' }}>
-              <div className="max-w-[650px]">
-                <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-full px-3 py-1.5 mb-5">
-                  <Sparkles size={14} className="text-blue-500" />
-                  <span className="text-xs md:text-sm text-blue-600 font-medium">
+            <div className="absolute inset-0 z-10 flex flex-col justify-center px-6 sm:px-10 md:px-16 lg:px-24">
+
+              <div className="w-full max-w-[220px] sm:max-w-[320px] md:max-w-[550px] lg:max-w-[650px]">
+
+                <div className="inline-flex max-w-full items-start sm:items-center gap-1 sm:gap-1.5 md:gap-2 bg-primary-50 border border-primary-200 rounded-sm px-1.5 py-0.5 sm:px-3 sm:py-1 md:px-4 md:py-2 mb-3 sm:mb-4 md:mb-6">
+                  <Sparkles size={10} className="text-primary-500 shrink-0 mt-0.5 sm:mt-0 sm:w-3 sm:h-3 md:w-3.5 md:h-3.5" />
+                  <span className="text-[8px] sm:text-[10px] md:text-sm text-primary-600 font-bold whitespace-normal sm:whitespace-nowrap leading-snug tracking-wide">
                     Platform Kesehatan Mental Berbasis AI
                   </span>
                 </div>
 
-                <h1 className="max-w-[720px] text-4xl md:text-5xl lg:text-[52px] xl:text-[56px] font-bold text-slate-900 leading-tight mb-4">
-                  {slide.title}
-                </h1>
+                <div className="min-h-[55px] sm:min-h-[70px] md:min-h-[130px] lg:min-h-[150px] flex items-start">
+                  <h1 className="text-base sm:text-xl md:text-[38px] lg:text-[44px] xl:text-[48px] font-extrabold text-slate-900 leading-[1.15] md:leading-[1.1]">
+                    {slide.title}
+                  </h1>
+                </div>
 
-                <p className="text-base md:text-lg text-slate-600 leading-relaxed mb-7 max-w-[560px]">
-                  {slide.desc}
-                </p>
+                <div className="min-h-[40px] sm:min-h-[50px] md:min-h-[80px] lg:min-h-[100px] flex items-start mb-2 sm:mb-4 md:mb-7">
+                  <p className="text-[8px] sm:text-[10px] md:text-base lg:text-lg text-slate-600 leading-[1.3] md:leading-relaxed max-w-[95%]">
+                    {slide.desc}
+                  </p>
+                </div>
 
-                <div className="flex flex-wrap gap-3 mb-8">
+                <div className="inline-grid grid-cols-2 sm:flex sm:flex-row gap-1.5 sm:gap-2 md:gap-3 w-max">
                   <Button
-                    size="lg"
                     onClick={() => navigate(ROUTES.REGISTER)}
-                    rightIcon={<ArrowRight size={18} />}
+                    size="hero"
+                    rightIcon={<ArrowRight size={10} className="sm:w-3 sm:h-3 md:w-5 md:h-5 shrink-0" />}
                   >
                     Mulai Sekarang
                   </Button>
 
-                  <button
+                  <Button
                     onClick={scrollToHowItWorks}
-                    className="inline-flex items-center gap-2 px-6 py-3 text-slate-700 font-medium text-base hover:text-slate-900 transition-colors"
+                    variant="secondary"
+                    size="hero"
+                    leftIcon={<Play size={8} className="text-slate-500 shrink-0 sm:w-2.5 sm:h-2.5 md:w-4 md:h-4" />}
                   >
-                    <Play size={16} className="text-slate-500" />
                     Pelajari Lebih Lanjut
-                  </button>
+                  </Button>
                 </div>
 
-                {/* Gambar mobile */}
-                <div className="md:hidden">
-                  <img
-                    src={slide.image}
-                    alt={`Ilustrasi ${slide.id}`}
-                    className="w-full max-w-xs mx-auto object-contain"
-                  />
-                </div>
               </div>
             </div>
+
           </div>
         ))}
       </div>
 
-      {/* Dots */}
-      <div className="absolute left-1/2 -translate-x-1/2 bottom-6 z-20 flex items-center gap-2">
-        {SLIDES.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => goTo(i)}
-            aria-label={`Pindah ke slide ${i + 1}`}
-            className={`rounded-full transition-all duration-300 ${
-              activeDot === i
-                ? 'w-8 h-2 bg-primary-600'
-                : 'w-2 h-2 bg-slate-300 hover:bg-slate-400'
-            }`}
-          />
-        ))}
-      </div>
-
-      {/* Arrow — desktop */}
       <button
         onClick={goPrev}
         aria-label="Slide sebelumnya"
-        className="hidden lg:flex absolute left-6 xl:left-10 top-1/2 -translate-y-1/2 w-11 h-11 bg-white/90 border border-slate-200 shadow-md rounded-full items-center justify-center text-slate-500 hover:text-primary-600 hover:border-primary-200 transition-all z-20"
+        className="flex absolute left-1 sm:left-2 md:left-4 lg:left-6 top-1/2 -translate-y-1/2 w-6 h-6 sm:w-8 sm:h-8 md:w-12 md:h-12 bg-white/90 border border-slate-200 shadow-lg rounded-full items-center justify-center text-slate-500 hover:text-primary-600 hover:border-primary-200 transition-all z-20 before:absolute before:-inset-3 before:content-['']"
       >
-        <ChevronLeft size={22} />
+        <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4 md:w-7 md:h-7" />
       </button>
 
       <button
         onClick={goNext}
         aria-label="Slide berikutnya"
-        className="hidden lg:flex absolute right-6 xl:right-10 top-1/2 -translate-y-1/2 w-11 h-11 bg-white/90 border border-slate-200 shadow-md rounded-full items-center justify-center text-slate-500 hover:text-primary-600 hover:border-primary-200 transition-all z-20"
+        className="flex absolute right-1 sm:right-2 md:right-4 lg:right-6 top-1/2 -translate-y-1/2 w-6 h-6 sm:w-8 sm:h-8 md:w-12 md:h-12 bg-white/90 border border-slate-200 shadow-lg rounded-full items-center justify-center text-slate-500 hover:text-primary-600 hover:border-primary-200 transition-all z-20 before:absolute before:-inset-3 before:content-['']"
       >
-        <ChevronRight size={22} />
+        <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 md:w-7 md:h-7" />
       </button>
     </section>
   )

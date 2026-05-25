@@ -81,9 +81,9 @@ function Profile() {
 
       const res =
         await authService
-        .updateProfile(
-          updatedData
-        );
+          .updateProfile(
+            updatedData
+          );
 
       const updatedUser = res;
 
@@ -144,10 +144,10 @@ function Profile() {
   };
 
   const handleCancel = () => {
-    setForm(user); 
+    setForm(user);
     setPreviewImage(null); // Hapus preview jika batal
     setImageFile(null);
-    setPasswords({ old: '', new: '', confirm: '' }); 
+    setPasswords({ old: '', new: '', confirm: '' });
     setIsEdit(false);
   };
 
@@ -158,11 +158,11 @@ function Profile() {
   return (
     <div className="p-6 md:p-10 md:px-12 min-h-screen bg-[#F8FAFC] flex flex-col gap-6 md:gap-8">
       <div className="w-full max-w-5xl mx-auto flex flex-col gap-6">
-        
+
         {/* KARTU ATAS: Top Bar Tunggal yang Selaras Ukurannya dengan ProfileEdit */}
         <div className="bg-white rounded-2xl border-[0.67px] border-gray-200 shadow-sm flex items-center justify-between gap-2 p-6 md:p-8 transition-all">
           <div className="flex items-center gap-4 md:gap-6">
-            
+
             {/* Area Avatar - Ukuran disamakan & proporsional */}
             <div className="w-14 h-14 md:w-20 md:h-20 bg-blue-800 flex items-center justify-center text-white border-[0.67px] border-blue-100 overflow-hidden shrink-0 rounded-xl md:rounded-2xl transition-all">
               {displayImage ? (
@@ -171,7 +171,7 @@ function Profile() {
                 <span className="text-xl md:text-3xl font-medium">{initial}</span>
               )}
             </div>
-            
+
             {/* Nama Pengguna */}
             <h2 className="text-slate-800 md:text-neutral-950 font-bold md:font-semibold text-base md:text-xl leading-snug transition-all">
               {isEdit ? (form.nama || 'Nama Pengguna') : user.nama}
@@ -182,9 +182,9 @@ function Profile() {
           {!isEdit ? (
             <button
               onClick={() => setIsEdit(true)}
-              className="bg-blue-800 hover:bg-blue-900 text-white flex items-center gap-1.5 px-3 py-2 md:px-5 md:py-2.5 rounded-xl md:rounded-[10px] text-xs md:text-base font-medium transition-all shadow-sm"
+              className="bg-primary-500 hover:bg-primary-700 text-white flex items-center gap-1.5 px-3 py-2 md:px-5 md:py-2.5 rounded-xl md:rounded-[10px] text-xs md:text-base font-medium transition-all shadow-sm"
             >
-              <Pencil size={14} className="md:w-4 md:h-4" /> 
+              <Pencil size={14} className="md:w-4 md:h-4" />
             </button>
           ) : (
             <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
@@ -197,7 +197,7 @@ function Profile() {
               <button
                 onClick={handleSave}
                 disabled={loading}
-                className="bg-blue-800 hover:bg-blue-900 text-white flex items-center gap-1.5 px-3 py-2 md:px-5 md:py-2.5 rounded-xl md:rounded-[10px] text-xs md:text-base font-medium transition-all shadow-sm disabled:opacity-50"
+                className="bg-primary-500 hover:bg-primary-700 text-white flex items-center gap-1.5 px-3 py-2 md:px-5 md:py-2.5 rounded-xl md:rounded-[10px] text-xs md:text-base font-medium transition-all shadow-sm disabled:opacity-50"
               >
                 <Save size={14} className="md:w-4 md:h-4" /> {loading ? '...' : ' '}
               </button>
@@ -209,10 +209,10 @@ function Profile() {
         {!isEdit ? (
           <ProfileView user={user} />
         ) : (
-          <ProfileEdit 
-            form={form} 
-            onUserChange={handleUserChange} 
-            passwords={passwords} 
+          <ProfileEdit
+            form={form}
+            onUserChange={handleUserChange}
+            passwords={passwords}
             onPasswordChange={handlePasswordChange}
             currentPhotoUrl={user.photoUrl}
             previewImage={previewImage}

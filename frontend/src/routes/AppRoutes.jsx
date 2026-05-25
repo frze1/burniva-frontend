@@ -1,47 +1,64 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { ROUTES } from '../utils/constants'
 import ProtectedRoute from './ProtectedRoute'
-import PublicRoute    from './PublicRoute'
-import MainLayout     from '../components/layout/MainLayout'
+import PublicRoute from './PublicRoute'
+import MainLayout from '../components/layout/MainLayout'
 
 // PASTIKAN IMPOR SEPERTI INI (Tanpa tanda kurung kurawal {})
-import ScrollToTop from '../components/common/ScrollToTop' 
+import ScrollToTop from '../components/common/ScrollToTop'
 
-import Landing   from '../pages/Landing'
-import Login     from '../pages/Login'
-import Register  from '../pages/Register'
+import Landing from '../pages/Landing'
+import Login from '../pages/Login'
+import Register from '../pages/Register'
 import Dashboard from '../pages/Dashboard'
-import Input     from '../pages/Input'
-import Result    from '../pages/Result'
-import Todo      from '../pages/Todo'
-import History   from '../pages/History'
-import Profile   from '../pages/Profile'
+import Input from '../pages/Input'
+import Result from '../pages/Result'
+import Todo from '../pages/Todo'
+import History from '../pages/History'
+import Profile from '../pages/Profile'
+
+// Admin
+import AdminLayout from '../components/layout/admin/adminLayout'
+import DashboardAdmin from '../pages/admin/DashboardAdmin'
+import PenggunaAdmin from '../pages/admin/PenggunaAdmin'
+import MonitoringAdmin from '../pages/admin/MonitoringAdmin'
+import AnalitikAdmin from '../pages/admin/AnalitikAdmin'
+import ProfilAdmin from '../pages/admin/ProfilAdmin'
 
 function AppRoutes() {
   return (
     <BrowserRouter>
       {/* Komponen diletakkan di sini, tepat di dalam BrowserRouter */}
-      <ScrollToTop /> 
+      <ScrollToTop />
 
       <Routes>
         <Route path={ROUTES.HOME} element={<Landing />} />
 
         <Route element={<PublicRoute />}>
-          <Route path={ROUTES.LOGIN}    element={<Login />}    />
+          <Route path={ROUTES.LOGIN} element={<Login />} />
           <Route path={ROUTES.REGISTER} element={<Register />} />
         </Route>
 
         <Route element={<ProtectedRoute />}>
           <Route element={<MainLayout />}>
             <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />
-            <Route path={ROUTES.INPUT}     element={<Input />}     />
-            <Route path={ROUTES.RESULT}    element={<Result />}    />
+            <Route path={ROUTES.INPUT} element={<Input />} />
+            <Route path={ROUTES.RESULT} element={<Result />} />
             <Route path={ROUTES.RESULT_DETAIL} element={<Result />} />
-            <Route path={ROUTES.TODO}      element={<Todo />}      />
-            <Route path={ROUTES.HISTORY}   element={<History />}   />
+            <Route path={ROUTES.TODO} element={<Todo />} />
+            <Route path={ROUTES.HISTORY} element={<History />} />
             <Route path={ROUTES.HISTORY_DETAIL} element={<Result />} />
-            <Route path={ROUTES.PROFILE}   element={<Profile />}   />
+            <Route path={ROUTES.PROFILE} element={<Profile />} />
           </Route>
+        </Route>
+
+        {/* Rute Khusus Admin (Bisa diakses tanpa login sementara) */}
+        <Route element={<AdminLayout />}>
+          <Route path="/admin/dashboard" element={<DashboardAdmin />} />
+          <Route path="/admin/pengguna" element={<PenggunaAdmin />} />
+          <Route path="/admin/monitoring" element={<MonitoringAdmin />} />
+          <Route path="/admin/analitik" element={<AnalitikAdmin />} />
+          <Route path="/admin/profil" element={<ProfilAdmin />} />
         </Route>
 
         <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />

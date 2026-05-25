@@ -11,11 +11,10 @@ const benefits = [
 function BenefitsSection() {
   return (
     <section id="tentang" className="py-20 bg-white">
-      <div className="max-w-6xl mx-auto px-4 md:px-6">
+      <div className="w-full px-6 sm:px-10 md:px-16 lg:px-24">
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
 
-          {/* Kiri — benefits */}
           <div>
             <p className="text-sm font-medium text-primary-600 mb-2">Manfaat</p>
             <h2 className="text-3xl font-bold text-slate-800 mb-6">
@@ -31,7 +30,6 @@ function BenefitsSection() {
             </div>
           </div>
 
-          {/* Kanan — AI insight card */}
           <Card padding="lg">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-8 h-8 rounded-xl bg-primary-50 flex items-center justify-center">

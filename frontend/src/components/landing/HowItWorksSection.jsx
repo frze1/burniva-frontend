@@ -19,9 +19,8 @@ const steps = [
 function HowItWorksSection() {
   return (
     <section id="cara-kerja" className="py-20 bg-slate-50">
-      <div className="max-w-6xl mx-auto px-4 md:px-6">
+      <div className="w-full px-6 sm:px-10 md:px-16 lg:px-24">
 
-        {/* Header */}
         <div className="text-center mb-12">
           <p className="text-sm font-medium text-primary-600 mb-2">Cara Kerja</p>
           <h2 className="text-3xl md:text-4xl font-bold text-slate-800">
@@ -29,7 +28,6 @@ function HowItWorksSection() {
           </h2>
         </div>
 
-        {/* Steps */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {steps.map(({ number, title, description }) => (
             <div key={number} className="flex flex-col">

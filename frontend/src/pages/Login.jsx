@@ -1,11 +1,14 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Mail, Lock, ArrowLeft, Activity } from 'lucide-react'
+import { Mail, Lock, ArrowLeft } from 'lucide-react'
 import { ROUTES } from '../utils/constants'
 import Input from '../components/ui/Input'
 import Button from '../components/ui/Button'
 import useAuthStore from '../store/auth/useAuthStore'
 import authService from '../services/auth/authService'
+import bgLogin from "../assets/bg-login.png"
+import logoW from '../assets/icons/Logo-W.svg'
+import logoCol from '../assets/icons/Logo.svg'
 
 function Login() {
   const navigate = useNavigate()
@@ -56,26 +59,23 @@ function Login() {
   return (
     <div className="flex min-h-screen">
 
-      {/* Panel Kiri — Ilustrasi (Desktop Only) */}
       <div className="hidden lg:flex w-[52%] relative flex-col overflow-hidden flex-shrink-0">
         <img
-          src="/src/assets/bg-login.png"
+          src={bgLogin}
           alt="Background"
           className="absolute inset-0 w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-black/35" />
 
         <div className="relative z-10 flex items-start justify-between p-10">
-          <div className="w-9 h-9 rounded-xl bg-primary-600 flex items-center justify-center flex-shrink-0">
-            <Activity size={20} className="text-white" />
-          </div>
+          <img src={logoW} alt="Logo" className="w-12 h-12 object-contain shrink-0" />
 
           <div className="max-w-xs">
             <h2 className="text-2xl font-bold text-white leading-snug mb-2">
               Kendalikan perjalanan<br />kesehatan mental kamu.
             </h2>
             <p className="text-sm text-white/70 leading-relaxed">
-              Deteksi burnout berbasis AI, pelacakan harian, dan rekomendasi yang dipersonalisasi — semua dalam satu tempat yang tenang dan fokus.
+              Deteksi burnout berbasis AI, pelacakan harian, dan rekomendasi yang dipersonalisasi. Semua dalam satu tempat yang tenang dan fokus.
             </p>
           </div>
         </div>
@@ -84,10 +84,8 @@ function Login() {
         <p className="relative z-10 px-10 pb-6 text-xs text-white/40">© 2026 BURNIVA</p>
       </div>
 
-      {/* Panel Kanan — Form */}
       <div className="flex-1 flex flex-col bg-white relative">
-        
-        {/* DESKTOP VIEW: Tombol Kembali di Pojok Kiri Atas (Tampilan Awal) */}
+
         <div className="hidden lg:block absolute top-10 left-10">
           <Link
             to={ROUTES.HOME}
@@ -98,11 +96,9 @@ function Login() {
           </Link>
         </div>
 
-        {/* Kontainer Utama Form */}
         <div className="flex-1 flex flex-col items-center justify-center px-8 py-10">
           <div className="w-full max-w-md">
-            
-            {/* MOBILE VIEW: Tombol Kembali Tepat di Atas Card */}
+
             <div className="block lg:hidden">
               <Link
                 to={ROUTES.HOME}
@@ -113,16 +109,12 @@ function Login() {
               </Link>
             </div>
 
-            {/* Card Form — Deteksi Enter Otomatis */}
-            <div 
+            <div
               className="bg-white rounded-2xl border border-[#E5E7EB] p-8 shadow-sm"
               onKeyDown={e => { if (e.key === 'Enter' && !isDisabled && !loading) handleSubmit() }}
             >
-              {/* MOBILE VIEW: Logo di Dalam Card */}
               <div className="flex lg:hidden items-center gap-2.5 mb-6">
-                <div className="w-8 h-8 rounded-lg bg-primary-600 flex items-center justify-center">
-                  <Activity size={18} className="text-white" />
-                </div>
+                <img src={logoCol} alt="BURNIVA" className="w-8 h-8 object-contain shrink-0" />
                 <span className="text-xl font-bold text-primary-700">BURNIVA</span>
               </div>
 
@@ -143,7 +135,7 @@ function Login() {
                 <Input
                   label="Email"
                   type="email"
-                  placeholder="kamu@kampus.ac.id"
+                  placeholder="nama@email.com"
                   value={form.email}
                   onChange={e => handleChange('email', e.target.value)}
                   error={errors.email}

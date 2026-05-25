@@ -23,20 +23,18 @@ function StepIndicator({ currentStep }) {
             {/* 1. Lingkaran & Teks */}
             <div className="relative flex flex-col items-center justify-center">
               <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center outline outline-2 outline-offset-[-2px] transition-all duration-300 z-10 ${
-                  isActive || isDone
-                    ? 'bg-blue-800 outline-blue-800 text-white shadow-sm'
+                className={`w-10 h-10 rounded-full flex items-center justify-center outline outline-2 outline-offset-[-2px] transition-all duration-300 z-10 ${isActive || isDone
+                    ? 'bg-primary-500 outline-primary-500 text-white shadow-sm'
                     : 'bg-white outline-gray-200 text-gray-400'
-                }`}
+                  }`}
               >
                 {isDone ? <Check size={18} strokeWidth={3} /> : <Icon size={18} />}
               </div>
-              
+
               {/* Teks diposisikan absolut ke bawah agar tidak merusak layout Flexbox garis */}
               <span
-                className={`absolute top-12 text-xs font-medium whitespace-nowrap transition-colors duration-300 ${
-                  isActive ? 'text-blue-800' : 'text-gray-500'
-                }`}
+                className={`absolute top-12 text-xs font-medium whitespace-nowrap transition-colors duration-300 ${isActive ? 'text-primary-500' : 'text-gray-500'
+                  }`}
               >
                 {step.label}
               </span>
@@ -46,7 +44,7 @@ function StepIndicator({ currentStep }) {
             {!isLast && (
               <div className="flex-1 h-[2px] bg-gray-200 mx-2 md:mx-4 overflow-hidden rounded-full">
                 <div
-                  className="h-full bg-blue-800 transition-all duration-500 ease-in-out"
+                  className="h-full bg-primary-500 transition-all duration-500 ease-in-out"
                   style={{ width: isDone ? '100%' : '0%' }}
                 />
               </div>

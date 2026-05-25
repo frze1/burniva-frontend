@@ -3,34 +3,61 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 @theme {
-  /* Primary — dari Figma */
-  --color-primary-50:  #eff6ff;
-  --color-primary-100: #dbeafe;
-  --color-primary-200: #bfdbfe;
-  --color-primary-300: #93c5fd;
-  --color-primary-400: #60a5fa;
-  --color-primary-500: #2d6fd4;
-  --color-primary-600: #1a58b7;
-  --color-primary-700: #154fa3;
-  --color-primary-800: #10408f;
-  --color-primary-900: #0c3275;
+  /* Primary (006D5B - Deep Teal / Hijau Tua) */
+  --color-primary-50: #f0f7f6;
+  --color-primary-100: #dbecea;
+  --color-primary-200: #badad5;
+  --color-primary-300: #8fc3bc;
+  --color-primary-400: #5fa89e;
+  --color-primary-500: #006d5b; /* Warna Asli */
+  --color-primary-600: #005748;
+  --color-primary-700: #004439;
+  --color-primary-800: #00332a;
+  --color-primary-900: #00261f;
 
+  /* Secondary (9AAEA9 - Sage Gray / Abu Kehijauan Meredam) */
+  --color-secondary-50: #f6f8f7;
+  --color-secondary-100: #eaefee;
+  --color-secondary-200: #cedbd8;
+  --color-secondary-300: #a8beba;
+  --color-secondary-400: #9aaea9; /* Warna Asli */
+  --color-secondary-500: #78908a; 
+  --color-secondary-600: #617671;
+  --color-secondary-700: #50615d;
+  --color-secondary-800: #43504d;
+  --color-secondary-900: #394543;
+
+  /* Accent (D4AF37 - Metallic Gold / Emas) */
+  --color-accent-50: #fbfaf3;
+  --color-accent-100: #f6f2e1;
+  --color-accent-200: #ebdcb4;
+  --color-accent-300: #dec281;
+  --color-accent-400: #d4af37; /* Warna Asli */
+  --color-accent-500: #b58f23;
+  --color-accent-600: #916a1b;
+  --color-accent-700: #78551a;
+  --color-accent-800: #654619;
+  --color-accent-900: #543a16;
+
+  /* Status Colors */
   --color-success: #22c55e;
   --color-warning: #f59e0b;
-  --color-danger:  #ef4444;
+  --color-danger: #ef4444;
 
-  /* Teks — dari Figma */
-  --color-text-primary:   #0a0a0a;
+  /* Teks */
+  --color-text-primary: #0a0a0a;
   --color-text-secondary: #6a7282;
   --color-text-placeholder: rgba(10, 10, 10, 0.5);
 
-  /* Border — dari Figma */
+  /* Border */
   --color-border: #e5e7eb;
 
+  /* Font */
   --font-sans: 'Inter', sans-serif;
 
-  --shadow-card: 0 1px 3px 0 rgba(0,0,0,0.07), 0 1px 2px -1px rgba(0,0,0,0.07);
-  --shadow-card-hover: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+  /* Shadows */
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.07), 0 1px 2px -1px rgba(0, 0, 0, 0.07);
+  --shadow-card-hover: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
 }
 
 * {
@@ -44,7 +71,64 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #f1f5f9; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9AAEA9; /* Menggunakan warna sekunder saat scrollbar di-hover */
+}
+
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
+input[type="password"]::-webkit-credentials-auto-fill-button,
+input[type="password"]::-webkit-textfield-decoration-container {
+  display: none !important;
+}
+
+/* Custom styling for native range input slider thumbs */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #006d5b;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 109, 91, 0.2);
+  cursor: pointer;
+  transition: transform 0.1s ease, background-color 0.1s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  background: #005748;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #006d5b;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 109, 91, 0.2);
+  cursor: pointer;
+  transition: transform 0.1s ease, background-color 0.1s ease;
+}
+
+input[type="range"]::-moz-range-thumb:hover {
+  transform: scale(1.15);
+  background: #005748;
+}

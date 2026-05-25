@@ -7,13 +7,14 @@ import {
 import { ROUTES } from '../../utils/constants'
 import { classNames } from '../../utils/helpers'
 import useAuthStore from '../../store/auth/useAuthStore'
+import logoCol from '../../assets/icons/Logo.svg'
 
 const navItems = [
-  { label: 'Dashboard',  icon: LayoutDashboard, path: ROUTES.DASHBOARD },
-  { label: 'Input',      icon: ClipboardList,   path: ROUTES.INPUT     },
-  { label: 'To-Do',      icon: CheckSquare,     path: ROUTES.TODO      },
-  { label: 'Riwayat',    icon: History,         path: ROUTES.HISTORY   },
-  { label: 'Profil',     icon: User,            path: ROUTES.PROFILE   },
+  { label: 'Dashboard', icon: LayoutDashboard, path: ROUTES.DASHBOARD },
+  { label: 'Input', icon: ClipboardList, path: ROUTES.INPUT },
+  { label: 'To-Do', icon: CheckSquare, path: ROUTES.TODO },
+  { label: 'Riwayat', icon: History, path: ROUTES.HISTORY },
+  { label: 'Profil', icon: User, path: ROUTES.PROFILE },
 ]
 
 function Sidebar({ isOpen, onClose }) {
@@ -88,14 +89,12 @@ function SidebarContent({ onOpenLogout, onClose }) {
       {/* Area Logo & Tombol Close */}
       <div className="flex items-center justify-between px-6 py-6">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-primary-600 flex items-center justify-center">
-            <Activity size={18} className="text-white" />
-          </div>
-          <span className="text-base font-bold text-primary-700">BURNIVA</span>
+          <img src={logoCol} alt="BURNIVA" className="w-8 h-8 object-contain shrink-0" />
+          <span className="text-base font-bold text-primary-500">BURNIVA</span>
         </div>
-        
+
         {/* Tombol X Khusus Mobile */}
-        <button 
+        <button
           onClick={onClose}
           className="lg:hidden p-1.5 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50 transition-colors"
         >
@@ -106,8 +105,8 @@ function SidebarContent({ onOpenLogout, onClose }) {
       {/* Navigasi Menu */}
       <nav className="flex-1 px-4 py-2 flex flex-col gap-1.5 overflow-y-auto">
         {navItems.map(({ label, icon: Icon, path }) => {
-          const isMatch = 
-            location.pathname === path || 
+          const isMatch =
+            location.pathname === path ||
             (path === ROUTES.INPUT && location.pathname === ROUTES.RESULT) ||
             (path === ROUTES.HISTORY && location.pathname.startsWith('/riwayat/'));
 

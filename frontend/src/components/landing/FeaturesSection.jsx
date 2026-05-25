@@ -3,19 +3,19 @@ import { Brain, ClipboardList, Sparkles } from 'lucide-react'
 const features = [
   {
     icon: Brain,
-    color: 'bg-blue-50 text-blue-600',
+    color: 'bg-primary-600 text-primary-50',
     title: 'Deteksi Berbasis AI',
     description: 'Analisis kondisi mental kamu menggunakan model AI cerdas yang mendeteksi risiko burnout secara real-time.',
   },
   {
     icon: ClipboardList,
-    color: 'bg-blue-50 text-blue-600',
+    color: 'bg-primary-600 text-primary-50',
     title: 'Pelacakan Harian',
     description: 'Catat aktivitas harian, tingkat stres, dan kebiasaan hidup dengan cara yang sederhana dan intuitif.',
   },
   {
     icon: Sparkles,
-    color: 'bg-blue-50 text-blue-600',
+    color: 'bg-primary-600 text-primary-50',
     title: 'Insight & Rekomendasi',
     description: 'Dapatkan insight yang dipersonalisasi dan saran konkret untuk meningkatkan kesejahteraan mental kamu.',
   },
@@ -24,9 +24,8 @@ const features = [
 function FeaturesSection() {
   return (
     <section id="fitur" className="py-20 bg-white">
-      <div className="max-w-6xl mx-auto px-4 md:px-6">
+      <div className="w-full px-6 sm:px-10 md:px-16 lg:px-24">
 
-        {/* Header */}
         <div className="text-center mb-12">
           <p className="text-sm font-medium text-primary-600 mb-2">Fitur</p>
           <h2 className="text-3xl md:text-4xl font-bold text-slate-800">
@@ -34,7 +33,6 @@ function FeaturesSection() {
           </h2>
         </div>
 
-        {/* Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {features.map(({ icon: Icon, color, title, description }) => (
             <div
