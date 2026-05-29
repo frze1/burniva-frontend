@@ -107,13 +107,23 @@ function History() {
                       <Calendar size={16} className="text-slate-400" />
                     </div>
 
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-[#0a0a0a] mb-1">
+                    <div className="flex-1 min-w-0 flex flex-col gap-1.5">
+                      <p className="text-sm font-medium text-[#0a0a0a]">
                         {new Date(item.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
                       </p>
-                      <span className={classNames('text-xs font-medium px-2.5 py-0.5 rounded-full', cfg.color, cfg.bg)}>
-                        {item.burnout_level}
-                      </span>
+                      
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className={classNames('text-[10px] font-bold px-2 py-0.5 rounded-md border', cfg.color, cfg.bg, 'border-current/10')}>
+                          Burnout: {item.burnout_level}
+                        </span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-md border text-indigo-700 bg-indigo-50 border-indigo-200">
+                          Mental: {item.Prediction?.mental_health_prediction || 'N/A'}
+                        </span>
+                      </div>
+
+                      <p className="text-xs text-slate-500 truncate mt-0.5">
+                        <span className="font-medium">Summary:</span> {item.stress} Stres • {item.anxiety} Cemas • {item.sleep_hours} Jam Tidur • {item.study_hours} Jam Belajar
+                      </p>
                     </div>
 
                     <div className="text-right flex-shrink-0">

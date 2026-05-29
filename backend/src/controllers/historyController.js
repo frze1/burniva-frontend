@@ -7,6 +7,11 @@ const getHistory = async (req, res) => {
       where: {
         user_id: req.user.id
       },
+      include: [
+        {
+          model: require('../models').Prediction
+        }
+      ],
       order: [
         ["createdAt", "DESC"]
       ]
@@ -26,7 +31,12 @@ const getHistoryById = async (req, res) => {
       where: {
         id: req.params.id,
         user_id: req.user.id
-      }
+      },
+      include: [
+        {
+          model: require('../models').Prediction
+        }
+      ]
     });
 
     if (!history) {

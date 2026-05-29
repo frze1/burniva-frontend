@@ -54,6 +54,28 @@ const User = sequelize.define(
     profile_image: {
       type: DataTypes.TEXT,
       allowNull: true
+    },
+
+    role: {
+      type: DataTypes.STRING,
+      defaultValue: "user",
+      allowNull: false
+    },
+
+    is_suspended: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false
+    },
+
+    reset_token: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+
+    reset_token_expire: {
+      type: DataTypes.DATE,
+      allowNull: true
     }
   },
   {

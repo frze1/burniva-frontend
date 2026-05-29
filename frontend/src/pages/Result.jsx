@@ -82,19 +82,28 @@ function Result() {
                 Metrik utama dari hasil analisis
               </p>
             </div>
-            <div className="flex flex-col gap-4 flex-1">
-              <div className="bg-slate-50 rounded-[10px] border-[0.67px] border-gray-200 p-4 flex flex-col gap-1">
+            <div className="flex flex-col gap-3 flex-1">
+              <div className="bg-slate-50 rounded-[10px] border-[0.67px] border-gray-200 p-3 flex items-center justify-between">
                 <span className="text-sm text-gray-500">Skor Burnout</span>
-                <span className="text-3xl font-normal text-neutral-950">{result?.burnout_score || 0}%</span>
+                <span className="text-2xl font-semibold text-neutral-950">{result?.burnout_score || 0}%</span>
               </div>
-              <div className="bg-slate-50 rounded-[10px] border-[0.67px] border-gray-200 p-4 flex items-center justify-between">
-                <div className="flex flex-col gap-1">
-                  <span className="text-sm text-gray-500">Status Burnout</span>
-                  <span className="text-xl font-medium text-neutral-950">Level Saat Ini</span>
+              
+              <div className="bg-slate-50 rounded-[10px] border-[0.67px] border-gray-200 p-3 flex items-center justify-between">
+                <span className="text-sm text-gray-500">Tingkat Burnout</span>
+                <div className="px-3 py-1 bg-orange-50 border-[0.67px] border-orange-300 rounded-lg">
+                  <span className="text-xs font-bold text-orange-600">{result?.burnout_level || 'Belum ada'}</span>
                 </div>
-                <div className="px-4 py-2 bg-orange-50 border-[0.67px] border-orange-300 rounded-lg">
-                  <span className="text-sm font-bold text-orange-600">{result?.burnout_level || 'Belum ada'}</span>
+              </div>
+
+              <div className="bg-slate-50 rounded-[10px] border-[0.67px] border-gray-200 p-3 flex items-center justify-between">
+                <span className="text-sm text-gray-500">Kondisi Mental (AI)</span>
+                <div className="px-3 py-1 bg-indigo-50 border-[0.67px] border-indigo-200 rounded-lg">
+                  <span className="text-xs font-bold text-indigo-600">{result?.Prediction?.mental_health_prediction || 'N/A'}</span>
                 </div>
+              </div>
+
+              <div className="bg-slate-50 rounded-[10px] border-[0.67px] border-gray-200 p-3 text-xs text-gray-600 mt-auto leading-relaxed">
+                <span className="font-semibold text-gray-800">Insight AI:</span> Berdasarkan kalkulasi, tingkat risiko burnout Anda berada di level <b>{result?.burnout_level}</b> dengan indikasi kesehatan mental <b>{result?.Prediction?.mental_health_prediction || 'N/A'}</b>.
               </div>
             </div>
           </div>

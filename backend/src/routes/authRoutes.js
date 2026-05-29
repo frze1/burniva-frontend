@@ -8,7 +8,9 @@ const {
  register,
  login,
  getProfile,
- updateProfile
+ updateProfile,
+ forgotPassword,
+ resetPassword
 } =
 require("../controllers/authController");
 
@@ -35,6 +37,16 @@ router.put(
  "/profile",
  authMiddleware,
  updateProfile
+);
+
+router.post(
+ "/forgot-password",
+ forgotPassword
+);
+
+router.post(
+ "/reset-password/:token",
+ resetPassword
 );
 
 module.exports =

@@ -83,99 +83,72 @@ const createAssessment =
       } = req.body
 
       // =================
-      // DUMMY AI LOGIC
+      // AI INTEGRATION
       // =================
+      const { predictMentalHealth } = require('../services/aiPredictionService');
+      const { Prediction } = require('../models');
 
-      const totalScore =
-        stress +
-        anxiety +
-        emotional_pressure +
-        academic_pressure +
-        financial_pressure +
-        family_expectation +
-        (10 -
-          social_support)
+      // Tetap hitung totalScore untuk persentase visualisasi frontend (0-100%)
+      const totalScore = stress + anxiety + emotional_pressure + academic_pressure + financial_pressure + family_expectation + (10 - social_support);
 
-      let burnoutLevel =
-        'Rendah'
+      // Panggil API AI
+      const aiResult = await predictMentalHealth(req.body);
+      
+      let burnoutLevel = 'Rendah';
+      let mentalHealthPred = 'Normal';
 
-      if (
-        totalScore >=
-        40
-      ) {
-        burnoutLevel =
-          'Tinggi'
-      } else if (
-        totalScore >=
-        25
-      ) {
-        burnoutLevel =
-          'Sedang'
+      if (aiResult.success && !aiResult.fallback) {
+        // Translasi response AI ("High", "Medium", "Low") ke format DB ("Tinggi", "Sedang", "Rendah")
+        const rawPrediction = aiResult.data.burnout_prediction;
+        if (rawPrediction === 'High' || rawPrediction === 'Tinggi') burnoutLevel = 'Tinggi';
+        else if (rawPrediction === 'Medium' || rawPrediction === 'Sedang') burnoutLevel = 'Sedang';
+        else burnoutLevel = 'Rendah';
+
+        mentalHealthPred = aiResult.data.mental_health_prediction;
+      } else {
+        // Fallback Logic (jika API AI Railway mati/timeout)
+        if (totalScore >= 40) burnoutLevel = 'Tinggi';
+        else if (totalScore >= 25) burnoutLevel = 'Sedang';
+        mentalHealthPred = 'Tidak dapat diakses (Fallback)';
       }
 
-      let recommendation =
-        []
-
-      if (
-        burnoutLevel ===
-        'Tinggi'
-      ) {
-        recommendation =
-          [
-            'Tidur cukup minimal 7 jam',
-            'Kurangi beban belajar',
-            'Istirahat berkala',
-            'Pertimbangkan konsultasi',
-          ]
-      } else if (
-        burnoutLevel ===
-        'Sedang'
-      ) {
-        recommendation =
-          [
-            'Perbaiki manajemen waktu',
-            'Kurangi screen time',
-            'Tambah aktivitas fisik',
-          ]
+      // Rekomendasi berdasarkan level (Tetap menggunakan IF-ELSE karena AI tidak mengembalikan rekomendasi)
+      let recommendation = [];
+      if (burnoutLevel === 'Tinggi') {
+        recommendation = ['Tidur cukup minimal 7 jam', 'Kurangi beban belajar', 'Istirahat berkala', 'Pertimbangkan konsultasi'];
+      } else if (burnoutLevel === 'Sedang') {
+        recommendation = ['Perbaiki manajemen waktu', 'Kurangi screen time', 'Tambah aktivitas fisik'];
       } else {
-        recommendation =
-          [
-            'Pertahankan kebiasaan sehat',
-          ]
+        recommendation = ['Pertahankan kebiasaan sehat'];
       }
 
       // =================
       // SAVE DATABASE
       // =================
 
-      const assessment =
-        await DailyInput.create(
-          {
-            user_id:
-              userId,
+      // 1. Simpan ke DailyInput (Agar Result.jsx dan History.jsx tetap aman & kompatibel)
+      const assessment = await DailyInput.create({
+        user_id: userId,
+        stress, anxiety, emotional_pressure, academic_pressure, study_hours,
+        sleep_hours, financial_pressure, family_expectation, social_support, activity_hours,
+        burnout_score: totalScore,
+        burnout_level: burnoutLevel,
+        recommendation,
+      });
 
-            stress,
-            anxiety,
-            emotional_pressure,
-
-            academic_pressure,
-            study_hours,
-
-            sleep_hours,
-            financial_pressure,
-            family_expectation,
-            social_support,
-            activity_hours,
-
-            burnout_score:
-              totalScore,
-
-            burnout_level:
-              burnoutLevel,
-
-            recommendation,
-          }
-        )
+      // 2. Simpan ke tabel Predictions (Instruksi Phase 4 & Phase 5)
+      await Prediction.create({
+        daily_input_id: assessment.id,
+        user_id: userId,
+        risk_level: burnoutLevel,
+        burnout_score: totalScore,
+        mental_health_index: 0, // Placeholder, AI saat ini tidak mereturn index numerical
+        analysis_text: mentalHealthPred,
+        recommendation: recommendation.join(', '),
+        burnout_prediction: aiResult.success && !aiResult.fallback ? aiResult.data.burnout_prediction : 'N/A',
+        mental_health_prediction: mentalHealthPred,
+        raw_assessment_input: req.body
+      });
 
       await generateTodos(userId, req.body);
 

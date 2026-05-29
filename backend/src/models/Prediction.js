@@ -33,6 +33,26 @@ const Prediction = sequelize.define("Prediction", {
     allowNull: true
   },
 
+  user_id: {
+    type: DataTypes.UUID,
+    allowNull: true // True to maintain backward compatibility if old rows exist
+  },
+
+  burnout_prediction: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+
+  mental_health_prediction: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+
+  raw_assessment_input: {
+    type: DataTypes.JSONB,
+    allowNull: true
+  },
+
   recommendation: {
     type: DataTypes.TEXT,
     allowNull: true

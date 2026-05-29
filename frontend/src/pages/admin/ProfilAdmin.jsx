@@ -3,6 +3,8 @@ import ProfileAvatarCard from '../../components/admin/profil/ProfileAvatarCard'
 import ProfileAccountInfoCard from '../../components/admin/profil/ProfileAccountInfoCard'
 import ProfileSecurityCard from '../../components/admin/profil/ProfileSecurityCard'
 import useAuthStore from '../../store/auth/useAuthStore'
+import authService from '../../services/auth/authService'
+import api from '../../services/api'
 
 function ProfilAdmin() {
     const { user, updateUser } = useAuthStore()
@@ -16,32 +18,44 @@ function ProfilAdmin() {
     const [newPassword, setNewPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (newPassword && newPassword !== confirmPassword) {
             alert('Password baru dan konfirmasi password tidak cocok!')
             return
         }
 
-        // Mock password update
-        if (newPassword && oldPassword) {
-            // In a real application, we would send oldPassword and newPassword to the backend
-            console.log('Password updated successfully')
+        try {
+            // Update nama, email, profile image
+            await authService.updateProfile({
+                name: adminName,
+                email: email,
+                profile_image: profileImage,
+                gender: user?.gender,
+                age: user?.age,
+                university: user?.university,
+                major: user?.major,
+                semester: user?.semester
+            })
+
+            // Update password jika ada input
+            if (newPassword && oldPassword) {
+                await api.put('/user/change-password', {
+                    current_password: oldPassword,
+                    new_password: newPassword,
+                    confirm_password: confirmPassword
+                })
+            }
+
+            alert('Perubahan berhasil disimpan!')
+
+            // Reset password fields
+            setOldPassword('')
+            setNewPassword('')
+            setConfirmPassword('')
+        } catch (error) {
+            console.error("Gagal menyimpan profil", error)
+            alert(error.response?.data?.message || "Terjadi kesalahan saat menyimpan profil")
         }
-
-        const updatedUser = {
-            ...user,
-            name: adminName,
-            email: email,
-            profileImage: profileImage,
-        }
-
-        updateUser(updatedUser)
-        alert('Perubahan berhasil disimpan!')
-
-        // Reset password fields
-        setOldPassword('')
-        setNewPassword('')
-        setConfirmPassword('')
     }
 
     return (

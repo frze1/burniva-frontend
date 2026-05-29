@@ -81,7 +81,10 @@ const register = async (req, res) => {
           user.name,
 
         email:
-          user.email
+          user.email,
+
+        role:
+          user.role
       }
     });
 
@@ -123,6 +126,13 @@ const login = async (req, res) => {
       });
     }
 
+    if (user.is_suspended) {
+      return res.status(403).json({
+        message:
+          "Akun Anda telah ditangguhkan. Silakan hubungi admin."
+      });
+    }
+
     const isPasswordMatch =
       await bcrypt.compare(
         password,
@@ -141,7 +151,8 @@ const login = async (req, res) => {
       jwt.sign(
         {
           id: user.id,
-          email: user.email
+          email: user.email,
+          role: user.role
         },
         process.env.JWT_SECRET,
         {
@@ -182,7 +193,10 @@ const login = async (req, res) => {
           user.semester,
 
         profile_image:
-          user.profile_image
+          user.profile_image,
+
+        role:
+          user.role
       }
     });
 
@@ -244,7 +258,10 @@ const getProfile =
           user.semester,
 
         profile_image:
-          user.profile_image
+          user.profile_image,
+
+        role:
+          user.role
       });
 
     } catch (error) {
@@ -316,9 +333,90 @@ const updateProfile =
 
   };
 
+// FORGOT PASSWORD
+const crypto = require("crypto");
+const { sendResetPasswordEmail } = require("../services/emailService");
+const { Op } = require("sequelize");
+
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ message: "Email wajib diisi" });
+    }
+
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      return res.status(404).json({ message: "Email tidak ditemukan" });
+    }
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    
+    const resetTokenExpire = new Date();
+    resetTokenExpire.setHours(resetTokenExpire.getHours() + 1);
+
+    await user.update({
+      reset_token: resetToken,
+      reset_token_expire: resetTokenExpire
+    });
+
+    await sendResetPasswordEmail(user.email, resetToken);
+
+    res.status(200).json({ message: "Email reset password telah dikirim" });
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// RESET PASSWORD
+const resetPassword = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { password, confirmPassword } = req.body;
+
+    if (!password || !confirmPassword) {
+      return res.status(400).json({ message: "Semua field wajib diisi" });
+    }
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({ message: "Konfirmasi password tidak sama" });
+    }
+
+    const user = await User.findOne({
+      where: {
+        reset_token: token,
+        reset_token_expire: {
+          [Op.gt]: new Date()
+        }
+      }
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Token tidak valid atau sudah kedaluwarsa" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await user.update({
+      password: hashedPassword,
+      reset_token: null,
+      reset_token_expire: null
+    });
+
+    res.status(200).json({ message: "Password berhasil diubah" });
+  } catch (error) {
+    console.error("Reset password error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+
 module.exports = {
   register,
   login,
   getProfile,
-  updateProfile
+  updateProfile,
+  forgotPassword,
+  resetPassword
 };

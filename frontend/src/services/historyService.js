@@ -1,36 +1,11 @@
-import axios from "axios";
+import api from "./api";
 
-const API =
-"http://localhost:5000/api/v1/history";
-
-export const getHistory =
-async () => {
-
-const token =
-localStorage.getItem(
-"token"
-);
-
-const response =
-await axios.get(
-API,
-{
-headers:{
-Authorization:
-`Bearer ${token}`
-}
-}
-);
-
-return response.data;
+export const getHistory = async () => {
+  const response = await api.get("/history");
+  return response.data;
 };
 
 export const getHistoryDetail = async (id) => {
-  const token = localStorage.getItem("token");
-  const response = await axios.get(`${API}/${id}`, {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  });
+  const response = await api.get(`/history/${id}`);
   return response.data;
 };

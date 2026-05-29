@@ -34,11 +34,15 @@ function Login() {
 
     try {
       setLoading(true)
-      await authService.login({
+      const user = await authService.login({
         email: form.email,
         password: form.password
       })
-      navigate(ROUTES.DASHBOARD)
+      if (user.role === 'admin') {
+        navigate('/admin/dashboard')
+      } else {
+        navigate(ROUTES.DASHBOARD)
+      }
     } catch (error) {
       console.error(error)
       setErrors({
@@ -153,6 +157,14 @@ function Login() {
                   error={errors.password}
                   leftIcon={<Lock size={16} />}
                 />
+                <div className="flex justify-end mt-2">
+                  <Link 
+                    to="/forgot-password" 
+                    className="text-sm text-primary-600 hover:text-primary-700 font-medium transition-colors"
+                  >
+                    Lupa Password?
+                  </Link>
+                </div>
               </div>
 
               <Button

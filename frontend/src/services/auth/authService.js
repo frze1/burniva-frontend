@@ -63,6 +63,19 @@ const authService = {
 
     return res.data
   },
+
+  forgotPassword: async (email) => {
+    const res = await api.post('/auth/forgot-password', { email })
+    return res.data
+  },
+
+  resetPassword: async (token, password, confirmPassword) => {
+    const res = await api.post(`/auth/reset-password/${token}`, { 
+      password, 
+      confirmPassword 
+    })
+    return res.data
+  },
 }
 
 export default authService

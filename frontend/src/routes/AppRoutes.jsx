@@ -3,6 +3,7 @@ import { ROUTES } from '../utils/constants'
 import ProtectedRoute from './ProtectedRoute'
 import PublicRoute from './PublicRoute'
 import MainLayout from '../components/layout/MainLayout'
+import AdminRoute from './AdminRoute'
 
 // PASTIKAN IMPOR SEPERTI INI (Tanpa tanda kurung kurawal {})
 import ScrollToTop from '../components/common/ScrollToTop'
@@ -10,6 +11,8 @@ import ScrollToTop from '../components/common/ScrollToTop'
 import Landing from '../pages/Landing'
 import Login from '../pages/Login'
 import Register from '../pages/Register'
+import ForgotPassword from '../pages/ForgotPassword'
+import ResetPassword from '../pages/ResetPassword'
 import Dashboard from '../pages/Dashboard'
 import Input from '../pages/Input'
 import Result from '../pages/Result'
@@ -37,6 +40,8 @@ function AppRoutes() {
         <Route element={<PublicRoute />}>
           <Route path={ROUTES.LOGIN} element={<Login />} />
           <Route path={ROUTES.REGISTER} element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
         </Route>
 
         <Route element={<ProtectedRoute />}>
@@ -52,13 +57,15 @@ function AppRoutes() {
           </Route>
         </Route>
 
-        {/* Rute Khusus Admin (Bisa diakses tanpa login sementara) */}
-        <Route element={<AdminLayout />}>
-          <Route path="/admin/dashboard" element={<DashboardAdmin />} />
-          <Route path="/admin/pengguna" element={<PenggunaAdmin />} />
-          <Route path="/admin/monitoring" element={<MonitoringAdmin />} />
-          <Route path="/admin/analitik" element={<AnalitikAdmin />} />
-          <Route path="/admin/profil" element={<ProfilAdmin />} />
+        {/* Rute Khusus Admin (Dilindungi) */}
+        <Route element={<AdminRoute />}>
+          <Route element={<AdminLayout />}>
+            <Route path="/admin/dashboard" element={<DashboardAdmin />} />
+            <Route path="/admin/pengguna" element={<PenggunaAdmin />} />
+            <Route path="/admin/monitoring" element={<MonitoringAdmin />} />
+            <Route path="/admin/analitik" element={<AnalitikAdmin />} />
+            <Route path="/admin/profil" element={<ProfilAdmin />} />
+          </Route>
         </Route>
 
         <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />

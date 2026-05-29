@@ -7,7 +7,6 @@ import MentalStep from '../components/form/MentalStep'
 import AcademicStep from '../components/form/AcademicStep'
 import LifestyleStep from '../components/form/LifestyleStep'
 import ReviewStep from '../components/form/ReviewStep'
-import burnoutService from '../services/burnout/burnoutService'
 import { createAssessment } from '../services/assessmentService'
 
 function Input() {
