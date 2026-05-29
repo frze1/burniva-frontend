@@ -16,7 +16,11 @@ require("dotenv").config();
 const app = express();
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: [
+    "http://localhost:5173",
+    "https://burniva-capstone.vercel.app",
+    process.env.FRONTEND_URL // Sebagai backup jika ada custom domain lain
+  ].filter(Boolean),
   credentials: true
 }));
 app.use(
