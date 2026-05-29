@@ -46,7 +46,7 @@ function Input() {
 
       localStorage.setItem("analysisResult", JSON.stringify(result));
 
-      navigate(`/result/${result.id}`);
+      navigate(ROUTES.RESULT);
     } catch (error) {
       console.log(error);
       alert("Gagal melakukan analisis");
