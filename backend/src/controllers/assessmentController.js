@@ -3,65 +3,7 @@ const {
   Todo
 } = require('../models')
 
-const generateTodos = async (userId, data) => {
-  const todos = [];
-
-  if (data.sleep_hours < 6) {
-    todos.push({
-      user_id: userId,
-      title: "Tidur lebih awal",
-      description: "Usahakan tidur minimal 7 jam malam ini",
-      priority: "high",
-    });
-  }
-
-  if (data.stress >= 7) {
-    todos.push({
-      user_id: userId,
-      title: "Istirahat mental",
-      description: "Luangkan waktu 15 menit untuk relaksasi",
-      priority: "high",
-    });
-  }
-
-  if (data.academic_pressure >= 7) {
-    todos.push({
-      user_id: userId,
-      title: "Atur waktu belajar",
-      description: "Bagi waktu belajar dengan metode Pomodoro",
-      priority: "high",
-    });
-  }
-
-  if (data.social_support <= 4) {
-    todos.push({
-      user_id: userId,
-      title: "Hubungi teman",
-      description: "Coba ngobrol dengan teman dekat hari ini",
-      priority: "medium",
-    });
-  }
-
-  if (data.activity_hours < 1) {
-    todos.push({
-      user_id: userId,
-      title: "Aktivitas fisik",
-      description: "Lakukan olahraga ringan 15 menit",
-      priority: "medium",
-    });
-  }
-
-  if (todos.length === 0) {
-    todos.push({
-      user_id: userId,
-      title: "Pertahankan kebiasaan sehat",
-      description: "Kondisi mentalmu baik, tetap jaga pola hidup sehat",
-      priority: "low",
-    });
-  }
-
-  await Todo.bulkCreate(todos);
-};
+const { generatePersonalizedTodos } = require('../services/geminiTodoService');
 
 const createAssessment =
   async (req, res) => {
@@ -88,8 +30,11 @@ const createAssessment =
       const { predictMentalHealth } = require('../services/aiPredictionService');
       const { Prediction } = require('../models');
 
-      // Tetap hitung totalScore untuk persentase visualisasi frontend (0-100%)
-      const totalScore = stress + anxiety + emotional_pressure + academic_pressure + financial_pressure + family_expectation + (10 - social_support);
+      // Kalkulasi skor mentah (Maksimum 70)
+      const rawScore = stress + anxiety + emotional_pressure + academic_pressure + financial_pressure + family_expectation + (10 - social_support);
+      
+      // Konversi ke persentase 0-100% untuk UI
+      const totalScore = Math.round((rawScore / 70) * 100);
 
       // Panggil API AI
       const aiResult = await predictMentalHealth(req.body);
@@ -107,9 +52,16 @@ const createAssessment =
         mentalHealthPred = aiResult.data.mental_health_prediction;
       } else {
         // Fallback Logic (jika API AI Railway mati/timeout)
-        if (totalScore >= 40) burnoutLevel = 'Tinggi';
-        else if (totalScore >= 25) burnoutLevel = 'Sedang';
+        if (totalScore >= 70) burnoutLevel = 'Tinggi';
+        else if (totalScore >= 40) burnoutLevel = 'Sedang';
         mentalHealthPred = 'Tidak dapat diakses (Fallback)';
+      }
+
+      // SMART OVERRIDE: Mencegah inkonsistensi AI. Jika skor persentase mentah sangat tinggi, paksa level Tinggi.
+      if (totalScore >= 75) {
+          burnoutLevel = 'Tinggi';
+      } else if (totalScore <= 20) {
+          burnoutLevel = 'Rendah';
       }
 
       // Rekomendasi berdasarkan level (Tetap menggunakan IF-ELSE karena AI tidak mengembalikan rekomendasi)
@@ -150,7 +102,34 @@ const createAssessment =
         raw_assessment_input: req.body
       });
 
-      await generateTodos(userId, req.body);
+      // =================
+      // AI TODO GENERATION (GEMINI)
+      // =================
+      const geminiTodos = await generatePersonalizedTodos(burnoutLevel, mentalHealthPred, req.body);
+      
+      // Duplicate Prevention: Hapus todo AI lama yang masih pending
+      await Todo.destroy({
+        where: {
+          user_id: userId,
+          generated_by_ai: true,
+          status: 'pending'
+        }
+      });
+
+      // Mapping format untuk database
+      const todosToSave = geminiTodos.map(todo => ({
+        user_id: userId,
+        title: todo.title,
+        description: todo.description,
+        priority: todo.priority || 'medium',
+        status: 'pending',
+        generated_by_ai: true
+      }));
+
+      // Simpan Todo baru
+      if (todosToSave.length > 0) {
+        await Todo.bulkCreate(todosToSave);
+      }
 
       res.status(201).json(
         assessment

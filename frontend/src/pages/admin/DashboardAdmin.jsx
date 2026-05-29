@@ -31,7 +31,10 @@ function DashboardAdmin() {
         <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-6">
             <StatsCards stats={stats} />
             <AnalyticsCharts trendData={analytics?.trendData} distributionData={analytics?.distributionData} />
-            <RecentActivities activities={activities.length > 0 ? activities : undefined} />
+            <RecentActivities 
+                activityData={analytics?.activityData} 
+                activities={activities.length > 0 ? activities : []} 
+            />
         </div>
     )
 }

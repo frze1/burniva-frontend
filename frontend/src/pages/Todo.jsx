@@ -296,7 +296,12 @@ function TodoItem({ todo, onToggle, onDelete }) {
           <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${cfg.color} ${cfg.bg}`}>
             {todo.priority}
           </span>
-          <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">
+          <span className={classNames(
+            'text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider',
+            todo.category === 'AI Suggestion'
+              ? 'bg-indigo-50 text-indigo-600 border border-indigo-100'
+              : 'bg-slate-100 text-slate-500 border border-slate-200'
+          )}>
             {todo.category}
           </span>
         </div>
@@ -320,6 +325,7 @@ function Todo() {
   const [todos, setTodos]       = useState([])
   const [filter, setFilter]     = useState('Semua')
   const [showAdd, setShowAdd]   = useState(false)
+  const [loading, setLoading]   = useState(true)
 
   useEffect(() => {
     loadTodos();
@@ -327,6 +333,7 @@ function Todo() {
 
   const loadTodos = async () => {
     try {
+      setLoading(true);
       const data = await getTodos();
       const mapPriority = { high: 'Tinggi', medium: 'Sedang', low: 'Rendah' };
       const formatted = data.map(t => ({
@@ -341,6 +348,8 @@ function Todo() {
       setTodos(formatted);
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -455,7 +464,14 @@ function Todo() {
 
       {/* List Todo */}
       <div className="flex flex-col gap-2">
-        {filtered.length === 0 ? (
+        {loading ? (
+          <div className="bg-white rounded-2xl border border-slate-100 py-16 flex flex-col items-center justify-center text-center">
+            <Sparkles size={32} className="text-primary-400 mb-3 animate-pulse" />
+            <p className="text-sm font-medium text-slate-500">
+              Sedang mengambil To-Do List...
+            </p>
+          </div>
+        ) : filtered.length === 0 ? (
           <div className="bg-white rounded-2xl border border-slate-100 py-16 flex flex-col items-center justify-center text-center">
             <ListChecks size={32} className="text-slate-300 mb-3" />
             <p className="text-sm font-medium text-slate-500">

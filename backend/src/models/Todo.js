@@ -53,6 +53,11 @@ module.exports = (
             defaultValue:
               true,
           },
+
+        source_prediction_id: {
+          type: DataTypes.UUID,
+          allowNull: true,
+        },
       },
 
       {

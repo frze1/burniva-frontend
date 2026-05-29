@@ -1,13 +1,10 @@
 import React from 'react'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts'
+import { Activity } from 'lucide-react'
 
-const data = [
-    { name: 'Rendah', value: 65, color: '#10b981' }, // emerald-500
-    { name: 'Sedang', value: 23, color: '#f59e0b' }, // amber-500
-    { name: 'Tinggi', value: 12, color: '#ef4444' }, // red-500
-]
+function DistribusiBurnoutChart({ distributionData = [] }) {
+    const isDataEmpty = distributionData.reduce((sum, item) => sum + item.value, 0) === 0
 
-function DistribusiBurnoutChart() {
     return (
         <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex flex-col h-[380px]">
             <div>
@@ -16,28 +13,35 @@ function DistribusiBurnoutChart() {
             </div>
             
             <div className="flex-1 flex items-center justify-center relative min-h-[220px]">
-                <div className="w-[220px] h-[220px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                            <Pie
-                                data={data}
-                                innerRadius={70}
-                                outerRadius={95}
-                                paddingAngle={4}
-                                dataKey="value"
-                                stroke="none"
-                            >
-                                {data.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={entry.color} />
-                                ))}
-                            </Pie>
-                            <RechartsTooltip 
-                                formatter={(value) => [`${value}%`, 'Persentase']}
-                                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                            />
-                        </PieChart>
-                    </ResponsiveContainer>
-                </div>
+                {isDataEmpty ? (
+                    <div className="flex flex-col items-center justify-center opacity-50">
+                        <Activity size={32} className="text-slate-400 mb-2" />
+                        <p className="text-sm font-medium text-slate-500">Belum ada assessment</p>
+                    </div>
+                ) : (
+                    <div className="w-[220px] h-[220px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                                <Pie
+                                    data={distributionData}
+                                    innerRadius={70}
+                                    outerRadius={95}
+                                    paddingAngle={4}
+                                    dataKey="value"
+                                    stroke="none"
+                                >
+                                    {distributionData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={entry.color} />
+                                    ))}
+                                </Pie>
+                                <RechartsTooltip 
+                                    formatter={(value) => [value, 'Total Assessment']}
+                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                />
+                            </PieChart>
+                        </ResponsiveContainer>
+                    </div>
+                )}
             </div>
         </div>
     )

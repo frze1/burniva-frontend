@@ -15,6 +15,9 @@ router.put("/users/:id/suspend", adminController.suspendUser);
 router.delete("/users/:id", adminController.deleteUser);
 router.get("/monitoring", adminController.getMonitoringData);
 router.get("/analytics", adminController.getAnalyticsData);
+router.get("/filter-options", adminController.getFilterOptions);
 router.get("/activities", adminController.getRecentActivities);
+router.get("/export-csv", adminController.exportAssessmentData);
+router.get("/export-excel", adminController.exportExcelData);
 
 module.exports = router;

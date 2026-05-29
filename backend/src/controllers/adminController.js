@@ -147,14 +147,14 @@ const getMonitoringData = async (req, res) => {
     
     // Mock simple query, get 50 last inputs
     const inputs = await DailyInput.findAll({
-      include: [{ model: User, as: 'user', attributes: ['name', 'email'] }],
+      include: [{ model: User, attributes: ['name', 'email'] }],
       order: [['createdAt', 'DESC']],
       limit: 50
     });
 
     const formatted = inputs.map(input => ({
       id: input.id,
-      name: input.user?.name || 'Unknown',
+      name: input.User?.name || 'Unknown',
       score: input.burnout_score,
       risk: input.burnout_level,
       date: input.createdAt.toISOString().split('T')[0]
@@ -166,25 +166,164 @@ const getMonitoringData = async (req, res) => {
   }
 };
 
-// GET ANALYTICS DATA (MOCK DUMMY DATA AGAR SESUAI DENGAN CHART)
+// GET ANALYTICS DATA (REAL AGGREGATION OVER 7 DAYS WITH FILTERS)
 const getAnalyticsData = async (req, res) => {
   try {
-    // Sebagai permulaan (MVP), kembalikan data statis agar Frontend tidak rusak.
-    // Di phase berikutnya bisa diganti query agregasi kompleks
+    const { period, univ, prodi } = req.query;
+    
+    // Konfigurasi Filter
+    const userWhere = {};
+    if (univ) userWhere.university = univ;
+    if (prodi) userWhere.major = prodi;
+
+    const today = new Date();
+    // 7 Hari Terakhir
+    const dates = Array.from({ length: 7 }).map((_, i) => {
+      const d = new Date(today);
+      d.setDate(today.getDate() - (6 - i));
+      d.setHours(0, 0, 0, 0);
+      return d;
+    });
+
+    const dayNames = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+
+    // Ambil semua data 7 hari terakhir
+    const startDate = dates[0];
+    const endDate = new Date(today);
+    endDate.setHours(23, 59, 59, 999);
+
+    let dateWhere = {
+      createdAt: {
+        [Op.between]: [startDate, endDate]
+      }
+    };
+    
+    if (period === 'Semua Periode') {
+        dateWhere = {}; // Bebas
+    }
+
+    const inputs = await DailyInput.findAll({
+      where: dateWhere,
+      include: [{
+          model: User,
+          where: Object.keys(userWhere).length > 0 ? userWhere : undefined,
+          attributes: ['id']
+      }],
+      attributes: ['burnout_score', 'createdAt']
+    });
+
+    // Inisialisasi map per hari
+    const trendMap = {};
+    const activityMap = {};
+
+    dates.forEach(d => {
+      const dayStr = dayNames[d.getDay()];
+      trendMap[dayStr] = { sum: 0, count: 0 };
+      activityMap[dayStr] = 0;
+    });
+
+    // Populate data
+    inputs.forEach(input => {
+      const dayStr = dayNames[input.createdAt.getDay()];
+      if (trendMap[dayStr]) {
+        trendMap[dayStr].sum += input.burnout_score;
+        trendMap[dayStr].count += 1;
+        activityMap[dayStr] += 1;
+      }
+    });
+
+    // Konversi ke format array untuk chart
+    const trendData = dates.map(d => {
+      const dayStr = dayNames[d.getDay()];
+      const item = trendMap[dayStr];
+      const avg = item.count > 0 ? Math.round(item.sum / item.count) : 0;
+      return { name: dayStr, value: avg };
+    });
+
+    const activityData = dates.map(d => {
+      const dayStr = dayNames[d.getDay()];
+      return { name: dayStr, value: activityMap[dayStr] };
+    });
+
+    // Distribusi Keseluruhan
+    const includeUserOptions = Object.keys(userWhere).length > 0 ? [{ model: User, where: userWhere, attributes: ['id'] }] : [];
+
+    const totalRendah = await DailyInput.count({ 
+      where: { ...dateWhere, burnout_level: 'Rendah' },
+      include: includeUserOptions
+    });
+    const totalSedang = await DailyInput.count({ 
+      where: { ...dateWhere, burnout_level: 'Sedang' },
+      include: includeUserOptions
+    });
+    const totalTinggi = await DailyInput.count({ 
+      where: { ...dateWhere, burnout_level: 'Tinggi' },
+      include: includeUserOptions
+    });
+
+    // --- DATA PERTUMBUHAN PENGGUNA (CUMULATIVE) ---
+    const allUsers = await User.findAll({ where: { role: 'user' }, attributes: ['createdAt'] });
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+    const growthMap = {};
+    months.forEach(m => growthMap[m] = 0);
+    allUsers.forEach(u => {
+      const m = months[u.createdAt.getMonth()];
+      if (growthMap[m] !== undefined) growthMap[m]++;
+    });
+    let cumulative = 0;
+    const userGrowthData = months.map(m => {
+      cumulative += growthMap[m];
+      return { name: m, value: cumulative };
+    });
+
+    // --- DATA KORELASI TIDUR & BURNOUT ---
+    const sleepInputs = await DailyInput.findAll({
+      where: dateWhere,
+      include: includeUserOptions,
+      attributes: ['sleep_hours', 'burnout_score']
+    });
+    const sleepCorrelationData = sleepInputs.map(input => ({
+      xLabel: `${input.sleep_hours || 0}j`,
+      score: input.burnout_score
+    }));
+
+    // --- DATA SEMESTER ---
+    const semMap = {};
+    for (let i = 1; i <= 8; i++) semMap[`S${i}`] = { rendah: 0, sedang: 0, tinggi: 0 };
+    
+    const inputsWithSemester = await DailyInput.findAll({
+      where: dateWhere,
+      include: [{
+          model: User,
+          where: Object.keys(userWhere).length > 0 ? userWhere : undefined,
+          attributes: ['semester']
+      }],
+      attributes: ['burnout_level']
+    });
+
+    inputsWithSemester.forEach(input => {
+      const semStr = `S${input.User?.semester || 1}`;
+      if (!semMap[semStr]) semMap[semStr] = { rendah: 0, sedang: 0, tinggi: 0 };
+      if (input.burnout_level === 'Rendah') semMap[semStr].rendah++;
+      else if (input.burnout_level === 'Sedang') semMap[semStr].sedang++;
+      else if (input.burnout_level === 'Tinggi') semMap[semStr].tinggi++;
+    });
+
+    const semesterData = Object.keys(semMap).sort().map(k => ({
+      name: k,
+      ...semMap[k]
+    }));
+
     res.json({
-      trendData: [
-        { name: 'Sen', value: 105 },
-        { name: 'Sel', value: 110 },
-        { name: 'Rab', value: 115 },
-        { name: 'Kam', value: 125 },
-        { name: 'Jum', value: 120 },
-        { name: 'Sab', value: 140 },
-        { name: 'Min', value: 135 }
-      ],
+      trendData,
+      activityData,
+      userGrowthData,
+      sleepCorrelationData,
+      semesterData,
       distributionData: [
-        { name: 'Rendah', value: await DailyInput.count({where: {burnout_level:'Rendah'}}), color: '#10b981' },
-        { name: 'Sedang', value: await DailyInput.count({where: {burnout_level:'Sedang'}}), color: '#f59e0b' },
-        { name: 'Tinggi', value: await DailyInput.count({where: {burnout_level:'Tinggi'}}), color: '#ef4444' }
+        { name: 'Rendah', value: totalRendah, color: '#10b981' },
+        { name: 'Sedang', value: totalSedang, color: '#f59e0b' },
+        { name: 'Tinggi', value: totalTinggi, color: '#ef4444' }
       ]
     });
   } catch (error) {
@@ -196,22 +335,149 @@ const getAnalyticsData = async (req, res) => {
 const getRecentActivities = async (req, res) => {
   try {
     const recentInputs = await DailyInput.findAll({
-      include: [{ model: User, as: 'user', attributes: ['name'] }],
+      include: [{ model: User, attributes: ['name'] }],
       order: [['createdAt', 'DESC']],
       limit: 5
     });
 
     const activities = recentInputs.map(input => ({
       id: input.id,
-      name: input.user?.name || 'User',
+      name: input.User?.name || 'User',
       action: 'menyelesaikan assessment',
       time: input.createdAt.toISOString(),
-      initial: (input.user?.name || 'U').charAt(0).toUpperCase(),
+      initial: (input.User?.name || 'U').charAt(0).toUpperCase(),
       color: 'bg-primary-500'
     }));
 
     res.json(activities);
   } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// GET FILTER OPTIONS
+const getFilterOptions = async (req, res) => {
+  try {
+    // Get unique universities
+    const univs = await User.findAll({
+      attributes: [[User.sequelize.fn('DISTINCT', User.sequelize.col('university')), 'university']],
+      where: { role: 'user', university: { [Op.not]: null } }
+    });
+
+    // Get unique majors
+    const majors = await User.findAll({
+      attributes: [[User.sequelize.fn('DISTINCT', User.sequelize.col('major')), 'major']],
+      where: { role: 'user', major: { [Op.not]: null } }
+    });
+
+    res.json({
+      universities: univs.map(u => u.university).filter(Boolean),
+      majors: majors.map(m => m.major).filter(Boolean)
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// EXPORT CSV DATA
+const exportAssessmentData = async (req, res) => {
+  try {
+    const inputs = await DailyInput.findAll({
+      include: [{ model: User, attributes: ['name', 'email', 'university', 'major'] }],
+      order: [['createdAt', 'DESC']]
+    });
+
+    // Buat Header CSV
+    const csvHeader = "ID,Nama,Email,Universitas,Program Studi,Skor Burnout,Tingkat Risiko,Jam Tidur,Tanggal Assessment\n";
+    
+    // Buat Baris CSV
+    const csvRows = inputs.map(input => {
+      const u = input.User || {};
+      const date = input.createdAt.toISOString().split('T')[0];
+      // Escape koma pada teks
+      const escapeCSV = (text) => text ? `"${String(text).replace(/"/g, '""')}"` : '""';
+      
+      return [
+        input.id,
+        escapeCSV(u.name),
+        escapeCSV(u.email),
+        escapeCSV(u.university),
+        escapeCSV(u.major),
+        input.burnout_score,
+        input.burnout_level,
+        input.sleep_hours || 0,
+        date
+      ].join(',');
+    });
+
+    const csvData = csvHeader + csvRows.join('\n');
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename="Burniva_Assessment_Report.csv"');
+    res.status(200).send(csvData);
+
+  } catch (error) {
+    console.error("CSV Export Error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+const xlsx = require('xlsx');
+
+// EXPORT EXCEL DATA (.XLSX)
+const exportExcelData = async (req, res) => {
+  try {
+    const inputs = await DailyInput.findAll({
+      include: [{ model: User, attributes: ['name', 'email', 'university', 'major'] }],
+      order: [['createdAt', 'DESC']]
+    });
+
+    // Format data untuk worksheet
+    const excelData = inputs.map(input => {
+      const u = input.User || {};
+      const date = input.createdAt.toISOString().split('T')[0];
+      return {
+        'ID': input.id,
+        'Nama Lengkap': u.name || '',
+        'Email': u.email || '',
+        'Universitas': u.university || '',
+        'Program Studi': u.major || '',
+        'Skor Burnout': input.burnout_score,
+        'Tingkat Risiko': input.burnout_level,
+        'Jam Tidur': input.sleep_hours || 0,
+        'Tanggal Assessment': date
+      };
+    });
+
+    // Buat Workbook dan Worksheet
+    const worksheet = xlsx.utils.json_to_sheet(excelData);
+    
+    // Autoresize kolom biar rapih
+    const colWidths = [
+      { wch: 36 }, // ID
+      { wch: 25 }, // Nama
+      { wch: 30 }, // Email
+      { wch: 35 }, // Univ
+      { wch: 25 }, // Prodi
+      { wch: 15 }, // Skor
+      { wch: 15 }, // Risiko
+      { wch: 10 }, // Tidur
+      { wch: 20 }, // Tanggal
+    ];
+    worksheet['!cols'] = colWidths;
+
+    const workbook = xlsx.utils.book_new();
+    xlsx.utils.book_append_sheet(workbook, worksheet, "Laporan Burnout");
+
+    // Convert ke Buffer
+    const excelBuffer = xlsx.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename="Burniva_Assessment_Report.xlsx"');
+    res.status(200).send(excelBuffer);
+
+  } catch (error) {
+    console.error("Excel Export Error:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
@@ -224,5 +490,8 @@ module.exports = {
   deleteUser,
   getMonitoringData,
   getAnalyticsData,
-  getRecentActivities
+  getRecentActivities,
+  getFilterOptions,
+  exportAssessmentData,
+  exportExcelData
 };

@@ -3,24 +3,9 @@ import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
     PieChart, Pie, Cell
 } from 'recharts'
+import { Activity } from 'lucide-react'
 
-const DEFAULT_TREND_DATA = [
-    { name: 'Sen', value: 105 },
-    { name: 'Sel', value: 110 },
-    { name: 'Rab', value: 115 },
-    { name: 'Kam', value: 125 },
-    { name: 'Jum', value: 120 },
-    { name: 'Sab', value: 140 },
-    { name: 'Min', value: 135 },
-];
-
-const DEFAULT_DISTRIBUTION_DATA = [
-    { name: 'Rendah', value: 810, color: '#10b981' }, // emerald-500
-    { name: 'Sedang', value: 310, color: '#f59e0b' }, // amber-500
-    { name: 'Tinggi', value: 120, color: '#ef4444' }, // red-500
-];
-
-function AnalyticsCharts({ trendData = DEFAULT_TREND_DATA, distributionData = DEFAULT_DISTRIBUTION_DATA }) {
+function AnalyticsCharts({ trendData = [], distributionData = [] }) {
     const [trendPeriod, setTrendPeriod] = useState('Mingguan')
 
     return (
@@ -88,40 +73,49 @@ function AnalyticsCharts({ trendData = DEFAULT_TREND_DATA, distributionData = DE
                 </div>
                 
                 <div className="flex-1 flex flex-col justify-center min-h-[220px]">
-                    <div className="h-[200px] w-full relative">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <PieChart>
-                                <Pie
-                                    data={distributionData}
-                                    innerRadius={65}
-                                    outerRadius={85}
-                                    paddingAngle={5}
-                                    dataKey="value"
-                                    stroke="none"
-                                >
-                                    {distributionData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={entry.color} />
-                                    ))}
-                                </Pie>
-                                <RechartsTooltip 
-                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                                />
-                            </PieChart>
-                        </ResponsiveContainer>
-                    </div>
-
-                    {/* Custom Legend */}
-                    <div className="flex flex-col gap-3 mt-4 px-2">
-                        {distributionData.map((item) => (
-                            <div key={item.name} className="flex items-center justify-between text-sm">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: item.color }} />
-                                    <span className="text-slate-600">{item.name}</span>
-                                </div>
-                                <span className="font-semibold text-slate-800">{item.value}</span>
+                    {distributionData.reduce((sum, item) => sum + item.value, 0) === 0 ? (
+                        <div className="flex flex-col items-center justify-center w-full h-full opacity-50 py-10">
+                            <Activity size={32} className="text-slate-400 mb-2" />
+                            <p className="text-sm font-medium text-slate-500">Belum ada assessment</p>
+                        </div>
+                    ) : (
+                        <>
+                            <div className="h-[200px] w-full relative">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={distributionData}
+                                            innerRadius={65}
+                                            outerRadius={85}
+                                            paddingAngle={5}
+                                            dataKey="value"
+                                            stroke="none"
+                                        >
+                                            {distributionData.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.color} />
+                                            ))}
+                                        </Pie>
+                                        <RechartsTooltip 
+                                            contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                        />
+                                    </PieChart>
+                                </ResponsiveContainer>
                             </div>
-                        ))}
-                    </div>
+
+                            {/* Custom Legend */}
+                            <div className="flex flex-col gap-3 mt-4 px-2">
+                                {distributionData.map((item) => (
+                                    <div key={item.name} className="flex items-center justify-between text-sm">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: item.color }} />
+                                            <span className="text-slate-600">{item.name}</span>
+                                        </div>
+                                        <span className="font-semibold text-slate-800">{item.value}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
 

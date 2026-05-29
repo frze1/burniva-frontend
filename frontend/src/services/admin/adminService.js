@@ -31,13 +31,34 @@ const adminService = {
     return response.data;
   },
 
-  getAnalyticsData: async () => {
-    const response = await api.get('/admin/analytics');
+  getAnalyticsData: async (period = '', univ = '', prodi = '') => {
+    const params = new URLSearchParams();
+    if (period) params.append('period', period);
+    if (univ) params.append('univ', univ);
+    if (prodi) params.append('prodi', prodi);
+    
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+    const response = await api.get(`/admin/analytics${queryString}`);
+    return response.data;
+  },
+
+  getFilterOptions: async () => {
+    const response = await api.get('/admin/filter-options');
     return response.data;
   },
 
   getRecentActivities: async () => {
     const response = await api.get('/admin/activities');
+    return response.data;
+  },
+
+  downloadReport: async () => {
+    const response = await api.get('/admin/export-csv', { responseType: 'blob' });
+    return response.data;
+  },
+
+  downloadExcelReport: async () => {
+    const response = await api.get('/admin/export-excel', { responseType: 'blob' });
     return response.data;
   }
 };

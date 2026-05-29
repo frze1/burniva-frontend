@@ -1,18 +1,8 @@
 import React from 'react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts'
+import { GraduationCap } from 'lucide-react'
 
-const data = [
-    { name: 'S1', rendah: 40, sedang: 20, tinggi: 10 },
-    { name: 'S2', rendah: 45, sedang: 20, tinggi: 12 },
-    { name: 'S3', rendah: 40, sedang: 22, tinggi: 10 },
-    { name: 'S4', rendah: 48, sedang: 22, tinggi: 12 },
-    { name: 'S5', rendah: 50, sedang: 25, tinggi: 14 },
-    { name: 'S6', rendah: 55, sedang: 25, tinggi: 16 },
-    { name: 'S7', rendah: 52, sedang: 24, tinggi: 12 },
-    { name: 'S8', rendah: 48, sedang: 20, tinggi: 10 },
-]
-
-function SemesterBurnoutChart() {
+function SemesterBurnoutChart({ semesterData = [] }) {
     return (
         <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex flex-col h-[380px]">
             <div>
@@ -22,33 +12,38 @@ function SemesterBurnoutChart() {
 
             <div className="flex-1 w-full mt-4 min-h-[220px] flex flex-col">
                 <div className="flex-1">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                            <XAxis 
-                                dataKey="name" 
-                                axisLine={false} 
-                                tickLine={false} 
-                                tick={{ fill: '#94a3b8', fontSize: 11 }} 
-                                dy={10} 
-                            />
-                            <YAxis 
-                                domain={[0, 200]}
-                                ticks={[0, 50, 100, 150, 200]}
-                                axisLine={false} 
-                                tickLine={false} 
-                                tick={{ fill: '#94a3b8', fontSize: 11 }} 
-                                dx={-5}
-                            />
-                            <RechartsTooltip 
-                                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                            />
-                            {/* Stacked Bars */}
-                            <Bar dataKey="rendah" stackId="a" fill="#10b981" barSize={28} radius={[0, 0, 4, 4]} />
-                            <Bar dataKey="sedang" stackId="a" fill="#f59e0b" barSize={28} />
-                            <Bar dataKey="tinggi" stackId="a" fill="#ef4444" barSize={28} radius={[4, 4, 0, 0]} />
-                        </BarChart>
-                    </ResponsiveContainer>
+                    {semesterData.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center w-full h-full opacity-50">
+                            <GraduationCap size={32} className="text-slate-400 mb-2" />
+                            <p className="text-sm font-medium text-slate-500">Belum ada data semester</p>
+                        </div>
+                    ) : (
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={semesterData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                <XAxis 
+                                    dataKey="name" 
+                                    axisLine={false} 
+                                    tickLine={false} 
+                                    tick={{ fill: '#94a3b8', fontSize: 11 }} 
+                                    dy={10} 
+                                />
+                                <YAxis 
+                                    axisLine={false} 
+                                    tickLine={false} 
+                                    tick={{ fill: '#94a3b8', fontSize: 11 }} 
+                                    dx={-5}
+                                />
+                                <RechartsTooltip 
+                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                />
+                                {/* Stacked Bars */}
+                                <Bar dataKey="rendah" stackId="a" fill="#10b981" barSize={28} radius={[0, 0, 4, 4]} />
+                                <Bar dataKey="sedang" stackId="a" fill="#f59e0b" barSize={28} />
+                                <Bar dataKey="tinggi" stackId="a" fill="#ef4444" barSize={28} radius={[4, 4, 0, 0]} />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    )}
                 </div>
 
                 {/* Custom Legend at bottom */}

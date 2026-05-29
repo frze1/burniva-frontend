@@ -5,7 +5,7 @@ import useAuthStore from '../store/auth/useAuthStore'
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: { 'Content-Type': 'application/json' },
-  timeout: 10000,
+  timeout: 30000,
 })
 
 // Request interceptor — otomatis pasang token
