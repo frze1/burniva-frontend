@@ -1,0 +1,57 @@
+LAPORAN HASIL PENGUJIAN (TESTING) VERSI DEPLOY - ROLE ADMIN
+BURNIVA SYSTEM
+
+Berikut adalah penjabaran detail dari hasil pengujian keseluruhan terhadap fitur Admin pada sistem yang telah di-deploy (Production).
+
+=========================================
+1. AKSES & AUTENTIKASI ADMIN (ADM-AUTH)
+=========================================
+- ADM-AUTH-01: BERHASIL. Login menggunakan kredensial Admin berjalan lancar dan langsung dialihkan ke halaman Admin Dashboard sesuai ekspektasi.
+- ADM-AUTH-02: BERHASIL (Aman). Percobaan mengakses rute admin menggunakan akun User biasa langsung dicegat dan otomatis diarahkan kembali ke dashboard milik user.
+- ADM-AUTH-03: GAGAL (Bocor Logika RBAC). Rute masih "bocor" dari sisi Admin ke User. Admin masih dapat membuka halaman-halaman yang seharusnya khusus untuk User (seperti halaman input/assessment) dan sistem menganggapnya masuk seperti user biasa. Seharusnya akses dari Admin ke rute User ditolak atau dialihkan kembali ke halaman Admin.
+- ADM-AUTH-04: BERHASIL. Tombol logout berfungsi dengan baik, sesi terhapus sesuai ekspektasi.
+
+=========================================
+2. ADMIN DASHBOARD & OVERVIEW (ADM-DASH)
+=========================================
+- ADM-DASH-01: BERHASIL. Angka pada card statistik secara umum sesuai dengan yang diharapkan.
+- ADM-DASH-02: GAGAL SEBAGIAN (Beragam Issue UI & Data).
+  a) Terdapat ketidaksesuaian label waktu (tertera "perhari" namun di bawahnya muncul "senin-minggu").
+  b) Filter waktu (Harian, Mingguan, Bulanan) belum berfungsi / belum jadi.
+  c) Angka presentase distribusi burnout pada grafik lingkaran tidak sinkron dengan angka statistik pada card.
+  d) Pada list Aktivitas Terbaru, foto profil user tidak ter-load (masih menggunakan *placeholder* inisial huruf dengan background).
+  e) *Dropdown filter* pencarian (untuk Jurusan dan Universitas) masih manual/statis dan sangat terbatas. Seharusnya pilihan ini bersifat dinamis mengambil dari database.
+- ADM-DASH-03: GAGAL (Issue UX / Reactivity). Data tidak ter-update secara *real-time* atau reaktif. Admin harus melakukan *refresh* (F5) halaman secara manual agar user baru atau data terbaru muncul di layar.
+
+=========================================
+3. MANAJEMEN PENGGUNA (ADM-USER)
+=========================================
+- ADM-USER-01: BERHASIL. Tabel daftar pengguna berhasil dirender dan sistem *pagination* berjalan sesuai ekspektasi.
+- ADM-USER-02: BERHASIL. Fitur pencarian pengguna (search) berjalan sesuai ekspektasi.
+- ADM-USER-03: BERHASIL. Klik untuk melihat profil/detail pengguna berjalan sesuai ekspektasi.
+- ADM-USER-04: GAGAL SEBAGIAN (Issue UX State). Fungsionalitas "Hapus" dan "Suspend" (penangguhan akun) secara API berjalan dengan baik. (Pop-up konfirmasi hapus muncul, dan suspend berhasil memblokir user login dengan pesan "Akun ditangguhkan"). NAMUN, sama seperti Dashboard, perubahan daftar user di layar tidak ter-update otomatis (*state* tidak di-refresh); Admin harus mereload halaman (F5) untuk melihat user tersebut hilang atau berstatus suspended.
+
+=========================================
+4. ADMIN PROFILE (ADM-PROF)
+=========================================
+- ADM-PROF-01: GAGAL (Issue Upload & Validasi). Fitur simpan foto profil tidak berfungsi (foto tidak tersimpan). Selain itu, kurang validasi pada form teks: format email bisa diisi bebas (tidak divalidasi regex) serta nama dan email bisa dihapus menjadi kosong (tidak di-set wajib isi).
+- ADM-PROF-02: GAGAL (Issue UX Error Handling). Fitur "Ganti Password" sebenarnya berfungsi jika data benar. Namun, tidak ada umpan balik visual (*feedback* seperti pesan error/toast) jika Admin memasukkan password lama yang salah atau jika konfirmasi password baru tidak cocok. Sistem hanya "diam" tanpa interaksi apapun, yang dapat membingungkan pengguna.
+
+=========================================
+5. PENGUJIAN MOBILE (ADM-MOB)
+=========================================
+- ADM-MOB-01: BERHASIL. Menu dan navigasi berjalan sesuai ekspektasi di layar kecil.
+- ADM-MOB-02: BERHASIL (Issue UX Minor). Tabel Manajemen User berada dalam sebuah card, namun desainnya memaksa pengguna untuk menggeser/scroll secara horizontal (ke kanan) agar dapat melihat kolom paling akhir. Secara fungsional berjalan, namun secara estetika bisa diperbaiki di kemudian hari.
+- ADM-MOB-03: BERHASIL. Grafik menyesuaikan ukuran layar sesuai ekspektasi.
+
+=========================================
+KESIMPULAN DAN PRIORITAS TINDAKAN ADMIN:
+=========================================
+Berdasarkan hasil uji Admin, perbaikan prioritas ditekankan pada 3 hal utama:
+1. **Reaktivitas UI (State Management):** Segera perbaiki komponen tabel User dan aktivitas terbaru agar melakukan *refetch/refresh data* secara otomatis setelah operasi Hapus (Delete), Suspend, atau *submit* data berhasil dilakukan (tanpa menuntut admin menekan F5).
+2. **Perbaikan Error Handling (Profil & Password):** Sama seperti role User, integrasikan *alert* / notifikasi validasi saat ganti password gagal (karena salah *old password* atau *mismatch*), serta terapkan standar *required field* dan validasi ekstensi email pada halaman Profil Admin.
+3. **Data Dinamis & Perbaikan Chart Dashboard:** 
+   - Sinkronisasi nilai grafik *circle* dengan data di *card*.
+   - Ubah *dropdown* pilihan Jurusan/Universitas agar mengambil data unik dari database (dinamis).
+   - Pastikan URL foto profil user bisa *render* di tab Aktivitas Terbaru.
+   - Serta cegah rute bocor dari sisi Admin ke User agar keamanan lebih absolut.

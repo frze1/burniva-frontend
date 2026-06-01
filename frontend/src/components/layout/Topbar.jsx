@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '../../utils/constants'
 import { classNames, getInitials } from '../../utils/helpers'
 import useAuthStore from '../../store/auth/useAuthStore'
+import Avatar from '../../components/ui/Avatar'
 
 // (Notifikasi dihapus — fitur tidak digunakan)
 
@@ -63,13 +64,7 @@ function Topbar({ onToggleSidebar, title, subtitle }) {
               onClick={() => { setProfileOpen(!profileOpen) }}
               className="flex items-center gap-2 pl-2 pr-1 py-1 rounded-xl hover:bg-slate-100 transition-colors"
             >
-              <div className="w-8 h-8 rounded-xl bg-primary-600 flex items-center justify-center overflow-hidden shrink-0">
-                {user?.profile_image ? (
-                  <img src={user.profile_image} alt="Avatar" className="w-full h-full object-cover" />
-                ) : (
-                  <span className="text-white text-xs font-bold">{initials}</span>
-                )}
-              </div>
+              <Avatar src={user?.profile_image} name={user?.name} size="sm" />
               <ChevronDown
                 size={14}
                 className={classNames(

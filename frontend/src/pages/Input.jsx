@@ -57,13 +57,13 @@ function Input() {
 
   return (
     // Max-w-4xl agar form tidak melebar raksasa di layar desktop
-    <div className="p-6 md:p-10 w-full max-w-4xl mx-auto min-h-screen bg-[#F8FAFC] flex flex-col pt-12">
+    <div className="p-3 pb-24 md:p-10 md:pb-10 w-full max-w-4xl mx-auto min-h-screen bg-[#F8FAFC] flex flex-col pt-6 md:pt-12">
 
       {/* Step Indicator di luar card */}
       <StepIndicator currentStep={step} />
 
       {/* Card Form */}
-      <div className="bg-white rounded-2xl border-[0.67px] border-gray-200 shadow-sm p-6 md:p-10 flex flex-col gap-10">
+      <div className="bg-white rounded-2xl border-[0.67px] border-gray-200 shadow-sm p-4 md:p-10 flex flex-col gap-5 md:gap-10">
 
         {/* Area Render Step */}
         <div className="py-2">
@@ -78,7 +78,7 @@ function Input() {
 
           <button
             onClick={handleBack}
-            className="h-11 min-w-[112px] px-6 rounded-[10px] outline outline-[0.67px] outline-offset-[-0.67px] outline-gray-200 text-neutral-950 text-base font-medium hover:bg-gray-50 transition-colors flex items-center justify-center"
+            className="h-10 md:h-11 min-w-[90px] md:min-w-[112px] px-4 md:px-6 rounded-lg md:rounded-[10px] outline outline-[0.67px] outline-offset-[-0.67px] outline-gray-200 text-neutral-950 text-sm md:text-base font-medium hover:bg-gray-50 transition-colors flex items-center justify-center"
           >
             {step === 1 ? 'Batal' : 'Kembali'}
           </button>
@@ -86,7 +86,7 @@ function Input() {
           {step < 4 ? (
             <button
               onClick={handleNext}
-              className="h-11 min-w-[112px] px-6 bg-primary-500 rounded-[10px] text-white text-base font-medium hover:bg-primary-700 transition-all flex items-center justify-center gap-2"
+              className="h-10 md:h-11 min-w-[90px] md:min-w-[112px] px-4 md:px-6 bg-primary-500 rounded-lg md:rounded-[10px] text-white text-sm md:text-base font-medium hover:bg-primary-700 transition-all flex items-center justify-center gap-2"
             >
               Lanjut
               {/* Panah dihapus atau dipertahankan? Di Figma Tinjau tidak ada panahnya, tapi untuk UX bagusnya tetap ada panah untuk tombol Lanjut */}
@@ -95,7 +95,7 @@ function Input() {
             <button
               onClick={handleAnalysis}
               disabled={loading}
-              className="h-11 px-8 bg-primary-500 rounded-[10px] text-white text-base font-medium hover:bg-primary-700 transition-all flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+              className="h-10 md:h-11 px-5 md:px-8 bg-primary-500 rounded-lg md:rounded-[10px] text-white text-sm md:text-base font-medium hover:bg-primary-700 transition-all flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Menganalisis...' : 'Analisis Sekarang'}
             </button>

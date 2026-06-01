@@ -1,15 +1,19 @@
 import React, { useRef } from 'react';
-import { Camera } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import Input from '../ui/Input';
+import Avatar from '../ui/Avatar';
 
-function ProfileEdit({ 
-  form, 
-  onUserChange, 
-  passwords, 
-  onPasswordChange, 
-  currentPhotoUrl, 
-  previewImage, 
-  onImageSelected
+function ProfileEdit({
+  form,
+  onUserChange,
+  passwords,
+  onPasswordChange,
+  currentPhotoUrl,
+  previewImage,
+  onImageSelected,
+  onImageRemove,
+  personalErrorMsg,
+  securityErrorMsg
 }) {
   const fileInputRef = useRef(null);
 
@@ -29,23 +33,29 @@ function ProfileEdit({
   };
 
   const initial = form?.nama?.charAt(0).toUpperCase() || 'U';
-  const displayImage = previewImage || currentPhotoUrl;
+  const displayImage = previewImage === '' ? null : (previewImage || currentPhotoUrl);
 
   return (
     // REVISI: Langsung merender susunan Grid Utama tanpa Action Bar kembar
     <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 w-full items-start pb-4">
-      
+
       {/* --- Kiri: Informasi Pribadi --- */}
-      <div className="bg-white rounded-2xl border-[0.67px] border-gray-200 p-6 md:p-8 shadow-sm flex flex-col gap-6">
+      <div className="bg-white rounded-2xl border-[0.67px] border-gray-200 p-4 md:p-8 shadow-sm flex flex-col gap-4 md:gap-6">
         <div className="flex flex-col gap-1">
           <h3 className="text-lg font-bold text-neutral-950 leading-7">Informasi Pribadi</h3>
-          <p className="text-sm text-gray-500 leading-5">Perbarui data agar analisis AI tetap akurat.</p>
+          <p className="text-sm text-gray-500 leading-5">Perbarui informasi personal dan status akademikmu di sini.</p>
         </div>
 
+        {personalErrorMsg && (
+          <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 -mt-2">
+            <p className="text-sm font-medium text-red-600">{personalErrorMsg}</p>
+          </div>
+        )}
+
         <div className="flex flex-col gap-5">
-          <Input label="Nama Lengkap" name="nama" value={form.nama} onChange={onUserChange} placeholder="Nama Lengkap" />
-          <Input label="Email" name="email" type="email" value={form.email} onChange={onUserChange} placeholder="kamu@kampus.ac.id" />
-          
+          <Input label="Nama Lengkap *" name="nama" value={form.nama} onChange={onUserChange} placeholder="Nama Lengkap" required />
+          <Input label="Email *" name="email" type="email" value={form.email} onChange={onUserChange} placeholder="kamu@kampus.ac.id" required />
+
           {/* Jenis Kelamin */}
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-slate-700">Jenis Kelamin</label>
@@ -62,57 +72,89 @@ function ProfileEdit({
           </div>
 
           {/* Umur */}
-          <Input label="Umur" name="umur" type="number" value={form.umur} onChange={onUserChange} placeholder="Contoh: 21" />
+          <Input label="Umur" name="umur" type="number" value={form.umur} onChange={onUserChange} placeholder="Contoh: 21" min={0} />
 
           {/* Universitas */}
-          <Input label="Universitas" name="universitas" value={form.universitas} onChange={onUserChange} placeholder="Nama Universitas" />
+          <Input label="Universitas *" name="universitas" value={form.universitas} onChange={onUserChange} placeholder="Nama Universitas" required />
 
           {/* Program Studi */}
-          <Input label="Program Studi" name="prodi" value={form.prodi} onChange={onUserChange} placeholder="Program Studi / Jurusan" />
+          <Input label="Program Studi *" name="prodi" value={form.prodi} onChange={onUserChange} placeholder="Program Studi / Jurusan" required />
 
           {/* Semester */}
-          <Input label="Semester" name="semester" type="number" value={form.semester} onChange={onUserChange} placeholder="Contoh: 6" />
-          
+          <Input label="Semester *" name="semester" type="number" value={form.semester} onChange={onUserChange} placeholder="Contoh: 6" min={0} required />
+
           {/* AREA EDIT FOTO */}
           <div className="flex flex-col gap-2 mt-1">
             <label className="text-sm font-medium text-gray-700">Foto Profil</label>
-            
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              onChange={handleFileChange} 
-              accept="image/*" 
-              className="hidden" 
+
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept="image/*"
+              className="hidden"
             />
 
-            {/* Kotak Avatar */}
-            <div 
-              onClick={handleAvatarClick}
-              className="w-24 h-24 bg-blue-800 rounded-2xl flex items-center justify-center relative cursor-pointer group hover:bg-blue-900 transition-colors overflow-hidden shadow-sm"
-            >
-              {displayImage ? (
-                <img src={displayImage} alt="Avatar Preview" className="w-full h-full object-cover transition-transform group-hover:scale-105" />
-              ) : (
-                <span className="text-4xl text-white font-normal group-hover:scale-105 transition-transform">{initial}</span>
-              )}
-              
-              <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <Camera size={24} className="text-white" />
+            <div className="relative w-fit">
+              {/* Avatar yang bisa diklik */}
+              <div
+                onClick={handleAvatarClick}
+                className="cursor-pointer group rounded-2xl overflow-hidden shadow-sm"
+              >
+                <Avatar
+                  src={displayImage}
+                  name={form.nama}
+                  size="lg"
+                  className="group-hover:opacity-90 transition-opacity"
+                />
               </div>
+
+              {/* Tombol Hapus (Trash) - Hanya muncul jika ada foto */}
+              {displayImage && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (window.confirm('Apakah kamu yakin ingin menghapus foto profil ini?')) {
+                      onImageRemove();
+                    }
+                  }}
+                  className="absolute -top-2 -right-2 w-8 h-8 bg-white border border-red-100 rounded-full flex items-center justify-center text-red-500 hover:bg-red-50 hover:text-red-600 shadow-md transition-all z-10"
+                  title="Hapus Foto"
+                >
+                  <Trash2 size={14} />
+                </button>
+              )}
+
+              {/* Tombol Edit (Pensil) */}
+              <button
+                type="button"
+                onClick={handleAvatarClick}
+                className="absolute -bottom-2 -right-2 w-8 h-8 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 hover:text-primary-600 hover:border-primary-500 shadow-md transition-all z-10"
+                title="Ubah Foto"
+              >
+                <Pencil size={14} />
+              </button>
             </div>
           </div>
         </div>
       </div>
 
       {/* --- Kanan: Keamanan --- */}
-      <div className="bg-white rounded-2xl border-[0.67px] border-gray-200 p-6 md:p-8 shadow-sm flex flex-col gap-6">
+      <div className="bg-white rounded-2xl border-[0.67px] border-gray-200 p-4 md:p-8 shadow-sm flex flex-col gap-4 md:gap-6">
         <div className="flex flex-col gap-1">
           <h3 className="text-lg font-bold text-neutral-950 leading-7">Keamanan</h3>
           <p className="text-sm text-gray-500 leading-5">Ubah kata sandi</p>
         </div>
+
+        {securityErrorMsg && (
+          <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 -mt-2">
+            <p className="text-sm font-medium text-red-600">{securityErrorMsg}</p>
+          </div>
+        )}
+
         <div className="flex flex-col gap-5">
           <Input label="Kata Sandi Lama" name="old" type="password" value={passwords.old} onChange={onPasswordChange} placeholder="••••••••" />
-          <Input label="Kata Sandi Baru" name="new" type="password" value={passwords.new} onChange={onPasswordChange} placeholder="••••••••" />
+          <Input label="Kata Sandi Baru" name="new" type="password" value={passwords.new} onChange={onPasswordChange} placeholder="••••••••" hint="Minimal 6 karakter" />
           <Input label="Konfirmasi Kata Sandi" name="confirm" type="password" value={passwords.confirm} onChange={onPasswordChange} placeholder="••••••••" />
         </div>
       </div>

@@ -17,16 +17,17 @@ const register = async (req, res) => {
     } = req.body;
 
     // VALIDASI
-    if (
-      !name ||
-      !email ||
-      !password ||
-      !confirm_password
-    ) {
-      return res.status(400).json({
-        message:
-          "Semua field wajib diisi"
-      });
+    if (!name || !email || !password || !confirm_password) {
+      return res.status(400).json({ message: "Semua field wajib diisi" });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: "Format email tidak valid" });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ message: "Kata sandi minimal 6 karakter" });
     }
 
     // PASSWORD MATCH
@@ -304,10 +305,12 @@ const updateProfile =
         university,
         major,
         semester,
-        profile_image
+        profile_image,
+        old_password,
+        new_password
       } = req.body;
 
-      await user.update({
+      let updateData = {
         name,
         email,
         gender,
@@ -316,7 +319,17 @@ const updateProfile =
         major,
         semester,
         profile_image,
-      });
+      };
+
+      if (old_password && new_password) {
+        const isMatch = await bcrypt.compare(old_password, user.password);
+        if (!isMatch) {
+          return res.status(400).json({ message: "Kata sandi lama salah" });
+        }
+        updateData.password = await bcrypt.hash(new_password, 10);
+      }
+
+      await user.update(updateData);
 
       res.json(user);
 

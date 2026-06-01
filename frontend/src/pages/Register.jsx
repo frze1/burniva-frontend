@@ -28,14 +28,22 @@ function Register() {
 
   const validateStep1 = () => {
     const e = {}
-    if (!form.nama.trim()) e.nama = 'Nama lengkap wajib diisi'
-    if (!form.email.includes('@')) e.email = 'Format email tidak valid'
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+    if (!form.nama.trim()) {
+      e.nama = 'Nama lengkap wajib diisi'
+    }
+
+    if (!emailRegex.test(form.email)) {
+      e.email = 'Format email tidak valid'
+    }
+
     return e
   }
 
   const validateStep2 = () => {
     const e = {}
-    if (form.password.length < 8) e.password = 'Kata sandi minimal 8 karakter'
+    if (form.password.length < 6) e.password = 'Kata sandi minimal 6 karakter'
     if (form.password !== form.confirmPassword) {
       e.confirmPassword = 'Konfirmasi kata sandi tidak cocok'
     }
@@ -61,7 +69,14 @@ function Register() {
       })
       navigate(ROUTES.LOGIN)
     } catch (err) {
-      setErrors({ general: err.message || 'Pendaftaran gagal, coba lagi' })
+      const message =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        'Pendaftaran gagal, coba lagi'
+
+      setErrors({
+        general: message
+      })
     } finally {
       setLoading(false)
     }
@@ -204,7 +219,7 @@ function Register() {
                   <Input
                     label="Buat Kata Sandi"
                     type="password"
-                    placeholder="Minimal 8 karakter"
+                    placeholder="Minimal 6 karakter"
                     value={form.password}
                     onChange={e => handleChange('password', e.target.value)}
                     error={errors.password}

@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
-import { Menu, User, LogOut } from 'lucide-react'
+import { Menu, User, LogOut, ChevronDown } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { classNames, getInitials } from '../../../utils/helpers'
 import useAuthStore from '../../../store/auth/useAuthStore'
+import Avatar from '../../../components/ui/Avatar'
 
 function AdminTopbar({ onToggleSidebar, title, subtitle }) {
     const navigate = useNavigate()
@@ -50,17 +51,26 @@ function AdminTopbar({ onToggleSidebar, title, subtitle }) {
                 {/* Kanan: Icons Sesuai Referensi */}
                 <div className="flex items-center gap-4">
 
-                    {/* Icon Profil (Kotak Biru dengan Inisial) */}
+                    {/* Icon Profil (Sekarang pakai komponen Avatar) */}
                     <div className="relative" ref={profileRef}>
                         <button
-                            onClick={() => { setProfileOpen(!profileOpen) }}
-                            className="flex items-center justify-center w-8 h-8 rounded-xl bg-[#1e5eb0] hover:bg-blue-800 transition-colors overflow-hidden shrink-0"
+                            onClick={() => { setProfileOpen(!profileOpen); /* setNotifOpen(false) jika ada notifikasi */ }}
+                            className="flex items-center gap-2 p-1 rounded-xl hover:bg-slate-100 transition-colors shrink-0"
                         >
-                            {user?.profile_image ? (
-                                <img src={user.profile_image} alt="Avatar" className="w-full h-full object-cover" />
-                            ) : (
-                                <span className="text-white text-xs font-bold tracking-wide">{initials}</span>
-                            )}
+                            {/* Komponen Avatar mengambil alih tugas warna & ukuran otomatis */}
+                            <Avatar 
+                                src={user?.profile_image} 
+                                name={user?.name || 'Admin'} 
+                                size="sm" 
+                                className="shadow-sm" 
+                            />
+                            
+                            <ChevronDown
+                                size={14}
+                                className={`text-slate-400 transition-transform duration-200 ${
+                                    profileOpen ? 'rotate-180' : ''
+                                }`}
+                            />
                         </button>
 
                         {/* Dropdown Profil */}

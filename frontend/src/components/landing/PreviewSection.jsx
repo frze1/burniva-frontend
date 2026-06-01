@@ -22,17 +22,17 @@ function PreviewSection() {
   ];
 
   return (
-    <section className="py-20 bg-slate-50">
-      <div className="w-full px-6 sm:px-10 md:px-16 lg:px-24">
+    <section className="py-14 md:py-20 bg-slate-50">
+      <div className="w-full px-4 md:px-16 lg:px-24">
 
-        <div className="text-center mb-12">
-          <p className="text-sm font-medium text-blue-600 mb-2">Pratinjau</p>
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-800">
+        <div className="text-center mb-10 md:mb-12">
+          <p className="text-xs md:text-sm font-medium text-blue-600 mb-2">Pratinjau</p>
+          <h2 className="text-xl md:text-4xl font-bold text-slate-800">
             Antarmuka yang bersih dan intuitif
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
           {previews.map(({ title, desc, image }) => (
             <div
               key={title}
@@ -46,9 +46,9 @@ function PreviewSection() {
                 />
               </div>
 
-              <div className="bg-white px-5 py-4 border-t border-slate-100">
-                <p className="text-sm font-bold text-slate-800">{title}</p>
-                <p className="text-xs text-slate-500 mt-1">{desc}</p>
+              <div className="bg-white px-4 md:px-5 py-3 md:py-4 border-t border-slate-100">
+                <p className="text-[13px] md:text-sm font-bold text-slate-800">{title}</p>
+                <p className="text-[11px] md:text-xs text-slate-500 mt-1">{desc}</p>
               </div>
             </div>
           ))}

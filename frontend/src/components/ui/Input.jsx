@@ -55,7 +55,8 @@ function Input({
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+            /* REVISI DI SINI: Tambahkan z-10, p-1, dan geser sedikit ke right-2 */
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 p-1 text-slate-400 hover:text-slate-600"
           >
             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>

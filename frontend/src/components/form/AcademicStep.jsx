@@ -24,6 +24,7 @@ function AcademicStep({ formData, setFormData }) {
       }
     }
     if (h < 0) h = 0;
+    if (h > 24) h = 24;
 
     // Kembalikan ke format desimal untuk disimpan (contoh: 1 jam 15 menit -> 1.25)
     const decimalValue = h + (m / 60);
@@ -39,11 +40,11 @@ function AcademicStep({ formData, setFormData }) {
   };
 
   return (
-    <div className="flex flex-col gap-7 w-full">
-      
+    <div className="flex flex-col gap-5 md:gap-7 w-full">
+
       {/* Header Step Akademik */}
       <div className="flex flex-col gap-1 w-full">
-        <h2 className="text-xl font-medium text-neutral-950 leading-7">
+        <h2 className="text-lg md:text-xl font-medium text-neutral-950 leading-7">
           Akademik
         </h2>
         <p className="text-sm font-normal text-gray-500 leading-5">
@@ -52,92 +53,93 @@ function AcademicStep({ formData, setFormData }) {
       </div>
 
       {/* Area Form */}
-      <div className="flex flex-col gap-5 w-full">
-        
+      <div className="flex flex-col gap-4 md:gap-5 w-full">
+
         {/* 1. Tekanan Akademik (Tetap menggunakan Slider) */}
         <Slider
           label="Seberapa besar tekanan akademik?"
           value={formData.academic_pressure}
           onChange={v => setFormData({ ...formData, academic_pressure: v })}
-          min={1} 
+          min={1}
           max={10}
-          minLabel="Rendah" 
+          minLabel="Rendah"
           maxLabel="Tinggi"
         />
 
         {/* 2. Jam Belajar (Custom Time Input persis seperti Figma) */}
-        <div className="w-full bg-white rounded-2xl p-5 border-[0.67px] border-gray-200 flex flex-col gap-5">
-          
+        <div className="w-full bg-white rounded-2xl p-4 md:p-5 border-[0.67px] border-gray-200 flex flex-col gap-4 md:gap-5">
+
           {/* Header Label & Value Box Biru */}
           <div className="flex justify-between items-start gap-4">
             <div className="flex flex-col gap-1">
-              <h3 className="text-base font-medium text-gray-900">
+              <h3 className="text-sm md:text-base font-medium text-gray-900">
                 Berapa jam kamu belajar hari ini?
               </h3>
             </div>
-            
-            <div className="px-3 min-w-[4rem] h-10 bg-blue-50 rounded-[10px] border-[0.67px] border-blue-100 flex items-center justify-center flex-shrink-0">
-              <span className="text-lg font-normal text-blue-800 whitespace-nowrap">
+
+            <div className="px-2 md:px-3 min-w-[4rem] h-9 md:h-10 bg-primary-50 rounded-[10px] border-[0.67px] border-primary-200 flex items-center justify-center flex-shrink-0">
+              <span className="text-sm md:text-lg font-medium text-primary-500 whitespace-nowrap">
                 {formatDisplay(hours, minutes)}
               </span>
             </div>
           </div>
 
           {/* Area Kontrol Input (Jam & Menit) */}
-          <div className="flex flex-wrap items-center gap-6 pt-1">
-            
+          <div className="grid grid-cols-2 items-center gap-3 md:gap-6 pt-1">
+
             {/* --- Kontrol JAM --- */}
-            <div className="flex items-center gap-3">
-              <button 
+            <div className="flex items-center gap-1 md:gap-3 w-full">
+              <button
                 onClick={() => handleTimeChange(hours - 1, minutes)}
-                className="text-gray-500 hover:text-gray-900 text-2xl w-6 text-center focus:outline-none"
+                className="text-gray-500 hover:text-gray-900 text-xl md:text-2xl w-5 md:w-6 flex-shrink-0 text-center focus:outline-none"
               >
                 -
               </button>
-              <div className="flex items-stretch border border-gray-200 rounded-md overflow-hidden h-12 w-36">
-                <input 
-                  type="number" 
+              <div className="flex-1 flex items-stretch border border-gray-200 rounded-md overflow-hidden h-10 md:h-12 w-full min-w-0">
+                <input
+                  type="number"
                   value={hours}
                   onChange={(e) => handleTimeChange(parseInt(e.target.value), minutes)}
-                  className="w-full text-center text-neutral-950 text-base outline-none appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                  className="w-full text-center text-neutral-950 text-sm md:text-base outline-none appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none min-w-0"
                   min="0"
+                  max="24"
                 />
-                <div className="bg-slate-100 px-4 flex items-center justify-center border-l border-gray-200 shrink-0">
-                  <span className="text-gray-500 text-xs font-medium">Jam</span>
+                <div className="bg-slate-100 px-2 md:px-4 flex items-center justify-center border-l border-gray-200 shrink-0">
+                  <span className="text-gray-500 text-[10px] md:text-xs font-medium">Jam</span>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={() => handleTimeChange(hours + 1, minutes)}
-                className="text-gray-500 hover:text-gray-900 text-2xl w-6 text-center focus:outline-none"
+                className="text-gray-500 hover:text-gray-900 text-xl md:text-2xl w-5 md:w-6 flex-shrink-0 text-center focus:outline-none"
               >
                 +
               </button>
             </div>
 
             {/* --- Kontrol MENIT --- */}
-            <div className="flex items-center gap-3">
-              <button 
+            <div className="flex items-center gap-1 md:gap-3 w-full">
+              <button
                 onClick={() => handleTimeChange(hours, minutes - 15)}
-                className="text-gray-500 hover:text-gray-900 text-2xl w-6 text-center focus:outline-none"
+                className="text-gray-500 hover:text-gray-900 text-xl md:text-2xl w-5 md:w-6 flex-shrink-0 text-center focus:outline-none"
               >
                 -
               </button>
-              <div className="flex items-stretch border border-gray-200 rounded-md overflow-hidden h-12 w-36">
-                <input 
-                  type="number" 
+              <div className="flex-1 flex items-stretch border border-gray-200 rounded-md overflow-hidden h-10 md:h-12 w-full min-w-0">
+                <input
+                  type="number"
                   value={minutes}
                   onChange={(e) => handleTimeChange(hours, parseInt(e.target.value))}
-                  className="w-full text-center text-neutral-950 text-base outline-none appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                  className="w-full text-center text-neutral-950 text-sm md:text-base outline-none appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none min-w-0"
                   min="0"
                   step="15"
                 />
-                <div className="bg-slate-100 px-3 flex items-center justify-center border-l border-gray-200 shrink-0">
-                  <span className="text-gray-500 text-xs font-medium">Menit</span>
+                <div className="bg-slate-100 px-2 md:px-3 flex items-center justify-center border-l border-gray-200 shrink-0">
+                  <span className="text-gray-500 text-[10px] md:text-xs font-medium">Menit</span>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={() => handleTimeChange(hours, minutes + 15)}
-                className="text-gray-500 hover:text-gray-900 text-2xl w-6 text-center focus:outline-none"
+                className="text-gray-500 hover:text-gray-900 text-xl md:text-2xl w-5 md:w-6 flex-shrink-0 text-center focus:outline-none"
               >
                 +
               </button>

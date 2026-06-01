@@ -20,8 +20,14 @@ function Login() {
 
   const validate = () => {
     const e = {}
-    if (!form.email.includes('@')) e.email = 'Format email tidak valid'
-    if (form.password.length < 6) e.password = 'Kata sandi minimal 6 karakter'
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    
+    if (!emailRegex.test(form.email)) {
+      e.email = 'Format email tidak valid'
+    }
+    if (form.password.length < 6) {
+      e.password = 'Kata sandi minimal 6 karakter'
+    }
     return e
   }
 

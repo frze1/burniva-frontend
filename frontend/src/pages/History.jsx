@@ -50,7 +50,7 @@ function History() {
   }))
 
   return (
-    <div className="p-5 md:p-6 max-w-3xl mx-auto">
+    <div className="p-4 pb-24 md:p-6 md:pb-6 max-w-3xl mx-auto">
 
       {/* Card Grafik */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-card p-5 mb-4">

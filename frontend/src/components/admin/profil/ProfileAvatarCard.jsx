@@ -1,5 +1,6 @@
 import React, { useRef } from 'react'
-import { Camera } from 'lucide-react'
+import { Camera, Pencil, Trash2 } from 'lucide-react'
+import Avatar from '../../ui/Avatar'
 
 function ProfileAvatarCard({ adminName = 'Admin Burniva', email = 'admin@burniva.id', profileImage = null, onImageChange }) {
     const fileInputRef = useRef(null)
@@ -27,17 +28,17 @@ function ProfileAvatarCard({ adminName = 'Admin Burniva', email = 'admin@burniva
         <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex flex-col items-center h-full">
             <h3 className="text-base font-bold text-slate-800 self-start mb-6">Foto Profil</h3>
             
-            <div className="relative mt-2">
-                {/* Avatar Circle */}
-                <div className="w-28 h-28 rounded-full bg-primary-600 flex items-center justify-center shadow-inner overflow-hidden">
-                    {profileImage ? (
-                        <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
-                    ) : (
-                        <span className="text-4xl font-semibold text-white tracking-wide">{firstLetter}</span>
-                    )}
+            <div className="relative mt-2 w-fit mx-auto">
+                {/* Avatar */}
+                <div onClick={handleCameraClick} className="cursor-pointer group">
+                    <Avatar 
+                        src={profileImage} 
+                        name={adminName} 
+                        size="xl" 
+                        className="shadow-inner group-hover:opacity-90 transition-opacity" 
+                    />
                 </div>
                 
-                {/* Camera Icon Badge & Hidden Input */}
                 <input 
                     type="file" 
                     ref={fileInputRef} 
@@ -45,11 +46,27 @@ function ProfileAvatarCard({ adminName = 'Admin Burniva', email = 'admin@burniva
                     accept="image/*" 
                     className="hidden" 
                 />
+
+                {/* Tombol Hapus */}
+                {profileImage && (
+                    <button 
+                        onClick={() => {
+                            if (window.confirm('Hapus foto profil admin?')) {
+                                onImageChange(null);
+                            }
+                        }}
+                        className="absolute -top-1 -right-1 w-9 h-9 bg-white border border-red-100 rounded-full flex items-center justify-center text-red-500 hover:bg-red-50 hover:text-red-600 shadow-md transition-all z-10 cursor-pointer"
+                    >
+                        <Trash2 size={16} />
+                    </button>
+                )}
+
+                {/* Tombol Edit */}
                 <button 
                     onClick={handleCameraClick}
-                    className="absolute bottom-0 right-0 bg-white rounded-full p-2 border border-slate-100 shadow-md hover:bg-slate-50 transition-colors duration-150 group cursor-pointer"
+                    className="absolute -bottom-1 -right-1 w-9 h-9 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 hover:text-primary-600 hover:border-primary-500 shadow-md transition-all z-10 cursor-pointer"
                 >
-                    <Camera size={16} className="text-primary-600 group-hover:scale-105 transition-transform" />
+                    <Pencil size={16} />
                 </button>
             </div>
 

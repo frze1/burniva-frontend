@@ -1,0 +1,86 @@
+LAPORAN HASIL PENGUJIAN (TESTING) VERSI DEPLOY - BURNIVA SYSTEM
+
+Berikut adalah penjabaran detail dari hasil pengujian keseluruhan terhadap sistem yang telah di-deploy (Production), beserta analisis penyebab dan rekomendasi perbaikannya.
+
+=========================================
+1. MODUL AUTHENTICATION (AUTH)
+=========================================
+- AUTH-01: BERHASIL. Registrasi berjalan sesuai ekspektasi.
+- AUTH-02: GAGAL (Issue UX). Saat mencoba mendaftar dengan email yang sudah ada, muncul error "Request failed with status code 400" ketika mengklik buat akun. 
+  > **Penyebab:** Frontend (`Register.jsx`) tidak mengekstrak pesan error spesifik dari response backend Axios (`err.response.data.message`), melainkan langsung menampilkan pesan error bawaan Axios.
+  > **Tindakan Perbaikan:** Tangkap `err.response?.data?.message` di blok `catch` pada fungsi submit, dan tampilkan pesan tersebut ke UI.
+- AUTH-03: BERHASIL. Proses Login berjalan sesuai ekspektasi.
+- AUTH-04: BERHASIL. Proses Login gagal memunculkan peringatan sesuai ekspektasi.
+- AUTH-05: GAGAL (Kurang Validasi). Belum ada validasi format email yang ketat.
+  > **Penyebab:** Logika validasi form di frontend hanya mengecek keberadaan string `.includes('@')`.
+  > **Tindakan Perbaikan:** Gunakan Regex `/^[^\s@]+@[^\s@]+\.[^\s@]+$/` pada validasi email di `Register.jsx` dan `Login.jsx`.
+- AUTH-06: GAGAL (Kurang Validasi). Panjang password saat registrasi belum dibatasi secara ketat.
+  > **Penyebab:** Tidak ada pengecekan `password.length < 8` sebelum *submit* form.
+  > **Tindakan Perbaikan:** Tambahkan blok `if (password.length < 8)` yang memunculkan error "Minimal 8 karakter".
+- AUTH-07: GAGAL (Error Fitur). Fitur lupa password memunculkan pesan "Terjadi kesalahan saat mengirim email".
+  > **Penyebab:** Konfigurasi kredensial SMTP/Nodemailer di file `.env` server *production* kemungkinan belum disetel, salah, atau terblokir (kurang App Password jika memakai Gmail).
+  > **Tindakan Perbaikan:** Cek *log backend production* Vercel/Render, pastikan variabel `EMAIL_USER` dan `EMAIL_PASS` valid.
+- AUTH-08: BERHASIL. Tombol logout berjalan sesuai ekspektasi.
+
+=========================================
+2. MODUL INPUT DATA (INP)
+=========================================
+- INP-01: BERHASIL. Seluruh form dapat di-submit jika data terisi valid.
+- INP-02: BERHASIL. Input jam, menit, dan slider dapat menerima angka 0 dengan baik.
+- INP-03: GAGAL SEBAGIAN. Field Umur dan Semester di halaman Profile masih bisa diisi angka negatif.
+  > **Penyebab:** Atribut `min="0"` tidak disematkan pada elemen `<input type="number">` tersebut, dan backend tidak memvalidasi `>= 0`.
+  > **Tindakan Perbaikan:** Tambahkan `min={0}` di komponen `<input>` untuk Umur dan Semester.
+- INP-04: GAGAL (Kurang Validasi Batas). Field inputan "Jam" pada assessment tidak memiliki batas maksimal.
+  > **Penyebab:** Tidak ada atribut `max="24"` pada komponen input waktu.
+  > **Tindakan Perbaikan:** Tambahkan properti `max={24}` di form jam agar nilainya masuk akal.
+- INP-05: BERHASIL. Form kosong berhasil memunculkan pesan validasi sesuai ekspektasi.
+
+=========================================
+3. MODUL RESULT & KALKULASI (RES)
+=========================================
+- RES-01: BERHASIL. Hasil kalkulasi level burnout sesuai ekspektasi.
+- RES-02: GAGAL (Issue UI). Lingkaran indikator skor burnout masih statis berwarna biru.
+  > **Penyebab:** Kelas CSS untuk warna SVG/lingkaran (misalnya `stroke-primary-500`) bersifat *hardcoded* (statis) dan tidak dibuat dinamis membaca status level (`isHigh`, `isMedium`).
+  > **Tindakan Perbaikan:** Buat logika pengkondisian (misal: `stroke-${levelColor}`) pada tag `<circle>` di komponen `ResultCard.jsx`.
+- RES-03: BERHASIL. Rekomendasi AI dan Todo list berhasil muncul sesuai ekspektasi.
+
+=========================================
+4. MODUL HISTORY (HIS) & TODO LIST (TODO)
+=========================================
+- HIS-01, HIS-02: BERHASIL.
+- TODO-01, TODO-02, TODO-03, TODO-04: BERHASIL.
+
+=========================================
+5. MODUL PROFILE (PROF)
+=========================================
+- PROF-01: GAGAL SEBAGIAN. Pengubahan email bebas tanpa validasi format, dan "Ganti Kata Sandi" tidak berfungsi.
+  > **Penyebab:** Sama seperti `Register.jsx`, validasi Regex email tidak ada. Untuk password, backend belum memiliki blok logika untuk memverifikasi password lama (`bcrypt.compare`) dan *hash* password baru.
+  > **Tindakan Perbaikan:** Tambahkan validasi Regex di Frontend, dan implementasikan logika cek password di `authController.js` milik Backend.
+- PROF-02: BERHASIL. Bug penambahan +2 pada input semester sudah teratasi.
+- PROF-03: GAGAL. Field angka (Umur dan Semester) dapat menerima angka negatif (sama dengan penjelasan INP-03).
+- PROF-04: GAGAL (Issue UI). Area profil masih terdapat *background* / kotak biru.
+  > **Penyebab:** Komponen wadah foto di `ProfileEdit.jsx` masih menggunakan *class default* seperti `bg-primary-50` alih-alih transparan atau putih.
+  > **Tindakan Perbaikan:** Hapus kelas warna background pada kontainer avatar tersebut.
+- PROF-05: GAGAL (Issue UX Error). Muncul *native alert pop-up browser* ("burniva-capstone... gagal update profile").
+  > **Penyebab:** Frontend menggunakan fungsi `alert()` bawaan javascript saat menangkap error dari API.
+  > **Tindakan Perbaikan:** Hapus fungsi `alert()`, ganti dengan menyimpan error ke *state* (`setError`) lalu merendernya sebagai teks peringatan berwarna merah di bawah UI form.
+- PROF-06: GAGAL. Kolom wajib (Nama, Email) bisa dikosongkan.
+  > **Penyebab:** Tidak ada verifikasi `if (!name)` di fungsi submit, serta tag `<input>` tidak memiliki atribut `required`.
+  > **Tindakan Perbaikan:** Tambahkan validasi *mandatory fields* dan *block submit* jika kosong.
+
+=========================================
+6. PENGUJIAN MOBILE & RESPONSIVITAS (MOB)
+=========================================
+- MOB-01: BERHASIL. Navigasi lancar.
+- MOB-02, MOB-03, MOB-04: GAGAL (Issue UI). Layout form input, riwayat, dan result di mobile *kegedean* dan tidak proporsional.
+  > **Penyebab:** Kelas utilitas Tailwind yang digunakan (*padding*, *gap*, ukuran teks) statis dan terlalu besar untuk layar kecil (misal: `p-8` selalu dipakai).
+  > **Tindakan Perbaikan:** Terapkan desain *Mobile First* menggunakan *prefix* `md:` Tailwind. Contoh: ubah `p-8` menjadi `p-4 md:p-8` agar ukurannya otomatis mengecil di HP.
+
+=========================================
+KESIMPULAN DAN PRIORITAS TINDAKAN:
+=========================================
+Sebagian besar error yang ditemukan merupakan akibat dari **kurangnya validasi di level Frontend (UI)** dan penanganan (*Error Handling*) yang masih prematur. 
+Langkah termudah untuk menyelesaikan isu ini adalah:
+1. Memperbaiki seluruh Form (tambahkan atribut `required`, `min`, `max`, dan pengecekan *Regex* untuk email).
+2. Memperbaiki *Catch Error* di setiap fungsi API *call* agar menggunakan state lokal (`setError`) alih-alih `alert()` atau `console.log(err.message)`.
+3. Menambahkan sintaks `md:` pada seluruh kelas *sizing* Tailwind untuk membetulkan skala Mobile.

@@ -9,32 +9,32 @@ import { classNames } from '../utils/helpers'
 import ProgressBar from '../components/ui/ProgressBar'
 
 const ICONS = {
-  coffee:    <Coffee size={16} />,
-  moon:      <Moon size={16} />,
-  book:      <BookOpen size={16} />,
-  activity:  <Activity size={16} />,
-  heart:     <Heart size={16} />,
-  sun:       <Sun size={16} />,
-  globe:     <Globe size={16} />,
-  smile:     <Smile size={16} />,
-  list:      <ListChecks size={16} />,
-  sparkles:  <Sparkles size={16} />,
+  coffee: <Coffee size={16} />,
+  moon: <Moon size={16} />,
+  book: <BookOpen size={16} />,
+  activity: <Activity size={16} />,
+  heart: <Heart size={16} />,
+  sun: <Sun size={16} />,
+  globe: <Globe size={16} />,
+  smile: <Smile size={16} />,
+  list: <ListChecks size={16} />,
+  sparkles: <Sparkles size={16} />,
 }
 
 const ICON_OPTIONS = [
-  { key: 'coffee',   el: <Coffee size={18} />   },
-  { key: 'moon',     el: <Moon size={18} />     },
-  { key: 'book',     el: <BookOpen size={18} /> },
+  { key: 'coffee', el: <Coffee size={18} /> },
+  { key: 'moon', el: <Moon size={18} /> },
+  { key: 'book', el: <BookOpen size={18} /> },
   { key: 'activity', el: <Activity size={18} /> },
-  { key: 'heart',    el: <Heart size={18} />    },
-  { key: 'sun',      el: <Sun size={18} />      },
-  { key: 'globe',    el: <Globe size={18} />    },
-  { key: 'smile',    el: <Smile size={18} />    },
-  { key: 'list',     el: <ListChecks size={18} />},
+  { key: 'heart', el: <Heart size={18} /> },
+  { key: 'sun', el: <Sun size={18} /> },
+  { key: 'globe', el: <Globe size={18} /> },
+  { key: 'smile', el: <Smile size={18} /> },
+  { key: 'list', el: <ListChecks size={18} /> },
 ]
 
 const CATEGORIES = ['Mental', 'Tidur', 'Aktivitas', 'Akademik']
-const PRIORITIES  = ['Tinggi', 'Sedang', 'Rendah']
+const PRIORITIES = ['Tinggi', 'Sedang', 'Rendah']
 const QUICK_SUGGESTIONS = [
   'Minum air putih 2 liter',
   'Matikan notifikasi 1 jam',
@@ -43,18 +43,18 @@ const QUICK_SUGGESTIONS = [
 ]
 
 const priorityConfig = {
-  Tinggi: { color: 'text-red-500',    bg: 'bg-red-50',    border: 'border-red-200'    },
+  Tinggi: { color: 'text-red-500', bg: 'bg-red-50', border: 'border-red-200' },
   Sedang: { color: 'text-yellow-600', bg: 'bg-yellow-50', border: 'border-yellow-200' },
-  Rendah: { color: 'text-green-600',  bg: 'bg-green-50',  border: 'border-green-200'  },
+  Rendah: { color: 'text-green-600', bg: 'bg-green-50', border: 'border-green-200' },
 }
 
 const INITIAL_TODOS = [
-  { id: 1, title: 'Istirahat minimal 30 menit', desc: 'Ambil jeda panjang dari layar dan tugas.', category: 'Mental',   priority: 'Tinggi', icon: 'coffee',   done: false },
-  { id: 2, title: 'Kurangi beban tugas hari ini', desc: 'Pilih 2 tugas terpenting saja, sisanya tunda.', category: 'Akademik', priority: 'Tinggi', icon: 'book',     done: true  },
-  { id: 3, title: 'Tidur sebelum jam 23.00',    desc: 'Targetkan minimal 7 jam tidur malam ini.',      category: 'Tidur',    priority: 'Tinggi', icon: 'moon',     done: false },
-  { id: 4, title: 'Jalan santai 15 menit',      desc: 'Aktivitas fisik ringan untuk menyegarkan pikiran.', category: 'Aktivitas', priority: 'Sedang', icon: 'activity', done: false },
-  { id: 5, title: 'Latihan pernapasan 5 menit', desc: 'Tarik napas dalam untuk menurunkan kecemasan.',  category: 'Mental',   priority: 'Sedang', icon: 'heart',    done: false },
-  { id: 6, title: 'Paparan sinar matahari pagi', desc: '10–15 menit di pagi hari membantu ritme sirkadian.', category: 'Aktivitas', priority: 'Rendah', icon: 'sun',      done: false },
+  { id: 1, title: 'Istirahat minimal 30 menit', desc: 'Ambil jeda panjang dari layar dan tugas.', category: 'Mental', priority: 'Tinggi', icon: 'coffee', done: false },
+  { id: 2, title: 'Kurangi beban tugas hari ini', desc: 'Pilih 2 tugas terpenting saja, sisanya tunda.', category: 'Akademik', priority: 'Tinggi', icon: 'book', done: true },
+  { id: 3, title: 'Tidur sebelum jam 23.00', desc: 'Targetkan minimal 7 jam tidur malam ini.', category: 'Tidur', priority: 'Tinggi', icon: 'moon', done: false },
+  { id: 4, title: 'Jalan santai 15 menit', desc: 'Aktivitas fisik ringan untuk menyegarkan pikiran.', category: 'Aktivitas', priority: 'Sedang', icon: 'activity', done: false },
+  { id: 5, title: 'Latihan pernapasan 5 menit', desc: 'Tarik napas dalam untuk menurunkan kecemasan.', category: 'Mental', priority: 'Sedang', icon: 'heart', done: false },
+  { id: 6, title: 'Paparan sinar matahari pagi', desc: '10–15 menit di pagi hari membantu ritme sirkadian.', category: 'Aktivitas', priority: 'Rendah', icon: 'sun', done: false },
 ]
 
 // ── Komponen AddTodo ──────────────────────────────────────────
@@ -69,7 +69,7 @@ function AddTodo({ onBack, onSave }) {
   const handleQuickSuggest = (text) => setForm(p => ({ ...p, title: text }))
 
   return (
-    <div className="p-5 md:p-6 max-w-3xl mx-auto">
+    <div className="p-4 pb-24 md:p-6 md:pb-6 max-w-3xl mx-auto">
 
       {/* Kembali */}
       <button
@@ -79,10 +79,10 @@ function AddTodo({ onBack, onSave }) {
         <ArrowLeft size={16} /> Kembali ke daftar
       </button>
 
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-card p-6">
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-card p-4 md:p-6">
 
         {/* Header */}
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex items-center gap-3 mb-4 md:mb-6">
           <div className="w-9 h-9 rounded-xl bg-primary-50 flex items-center justify-center">
             <Plus size={18} className="text-primary-600" />
           </div>
@@ -93,7 +93,7 @@ function AddTodo({ onBack, onSave }) {
         </div>
 
         {/* Preview */}
-        <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-xl border border-slate-100 mb-6">
+        <div className="flex items-start gap-3 p-3 md:p-4 bg-slate-50 rounded-xl border border-slate-100 mb-4 md:mb-6">
           <div className="w-8 h-8 rounded-xl bg-primary-50 flex items-center justify-center text-primary-600 flex-shrink-0">
             {ICONS[form.icon]}
           </div>
@@ -114,7 +114,7 @@ function AddTodo({ onBack, onSave }) {
         </div>
 
         {/* Nama Tugas */}
-        <div className="mb-5">
+        <div className="mb-4 md:mb-5">
           <label className="text-sm font-medium text-[#0a0a0a] block mb-1.5">
             Nama Tugas <span className="text-red-500">*</span>
           </label>
@@ -130,7 +130,7 @@ function AddTodo({ onBack, onSave }) {
         </div>
 
         {/* Deskripsi */}
-        <div className="mb-5">
+        <div className="mb-4 md:mb-5">
           <label className="text-sm font-medium text-[#0a0a0a] block mb-1.5">
             Deskripsi (opsional)
           </label>
@@ -146,7 +146,7 @@ function AddTodo({ onBack, onSave }) {
         </div>
 
         {/* Kategori */}
-        <div className="mb-5">
+        <div className="mb-4 md:mb-5">
           <label className="text-sm font-medium text-[#0a0a0a] block mb-2">Kategori</label>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
             {CATEGORIES.map(cat => (
@@ -154,7 +154,7 @@ function AddTodo({ onBack, onSave }) {
                 key={cat}
                 onClick={() => setForm(p => ({ ...p, category: cat }))}
                 className={classNames(
-                  'h-10 rounded-xl text-sm font-medium border-2 transition-all',
+                  'h-9 md:h-10 rounded-xl text-xs md:text-sm font-medium border-2 transition-all',
                   form.category === cat
                     ? 'bg-primary-50 border-primary-600 text-primary-700'
                     : 'bg-white border-[#E5E7EB] text-[#6A7282] hover:border-primary-300'
@@ -167,7 +167,7 @@ function AddTodo({ onBack, onSave }) {
         </div>
 
         {/* Prioritas */}
-        <div className="mb-5">
+        <div className="mb-4 md:mb-5">
           <label className="text-sm font-medium text-[#0a0a0a] block mb-2">Prioritas</label>
           <div className="grid grid-cols-3 gap-2">
             {PRIORITIES.map(p => {
@@ -178,7 +178,7 @@ function AddTodo({ onBack, onSave }) {
                   key={p}
                   onClick={() => setForm(prev => ({ ...prev, priority: p }))}
                   className={classNames(
-                    'h-10 rounded-xl text-sm font-medium border-2 transition-all',
+                    'h-9 md:h-10 rounded-xl text-xs md:text-sm font-medium border-2 transition-all',
                     isActive
                       ? `${cfg.bg} ${cfg.border} ${cfg.color}`
                       : 'bg-white border-[#E5E7EB] text-[#6A7282] hover:border-slate-300'
@@ -192,7 +192,7 @@ function AddTodo({ onBack, onSave }) {
         </div>
 
         {/* Ikon */}
-        <div className="mb-5">
+        <div className="mb-4 md:mb-5">
           <label className="text-sm font-medium text-[#0a0a0a] block mb-2">Ikon</label>
           <div className="flex gap-2 flex-wrap">
             {ICON_OPTIONS.map(({ key, el }) => (
@@ -213,7 +213,7 @@ function AddTodo({ onBack, onSave }) {
         </div>
 
         {/* Saran Cepat */}
-        <div className="mb-6">
+        <div className="mb-4 md:mb-6">
           <label className="text-sm font-medium text-[#0a0a0a] block mb-2">Saran cepat</label>
           <div className="flex flex-wrap gap-2">
             {QUICK_SUGGESTIONS.map(s => (
@@ -257,7 +257,7 @@ function TodoItem({ todo, onToggle, onDelete }) {
 
   return (
     <div className={classNames(
-      'flex items-center gap-4 p-4 bg-white rounded-2xl border border-slate-100',
+      'flex items-center gap-3 md:gap-4 p-3 md:p-4 bg-white rounded-2xl border border-slate-100',
       'hover:border-slate-200 hover:shadow-sm transition-all',
       todo.done && 'opacity-60'
     )}>
@@ -280,24 +280,24 @@ function TodoItem({ todo, onToggle, onDelete }) {
       </button>
 
       {/* Icon */}
-      <div className="w-9 h-9 rounded-xl bg-primary-50 flex items-center justify-center text-primary-600 flex-shrink-0">
+      <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-primary-50 flex items-center justify-center text-primary-600 flex-shrink-0">
         {ICONS[todo.icon] || <Coffee size={16} />}
       </div>
 
       {/* Konten */}
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 flex-wrap mb-0.5">
+        <div className="flex items-center gap-1.5 md:gap-2 flex-wrap mb-0.5">
           <p className={classNames(
-            'text-sm font-medium text-[#0a0a0a] truncate',
+            'text-[13px] md:text-sm font-medium text-[#0a0a0a] truncate',
             todo.done && 'line-through text-slate-400'
           )}>
             {todo.title}
           </p>
-          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${cfg.color} ${cfg.bg}`}>
+          <span className={`text-[10px] md:text-xs px-1.5 md:px-2 py-0.5 rounded-full font-medium leading-none flex items-center ${cfg.color} ${cfg.bg}`}>
             {todo.priority}
           </span>
           <span className={classNames(
-            'text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider',
+            'text-[9px] md:text-[10px] px-1.5 md:px-2 py-0.5 rounded-full font-bold uppercase tracking-wider leading-none flex items-center',
             todo.category === 'AI Suggestion'
               ? 'bg-indigo-50 text-indigo-600 border border-indigo-100'
               : 'bg-slate-100 text-slate-500 border border-slate-200'
@@ -322,10 +322,10 @@ function TodoItem({ todo, onToggle, onDelete }) {
 
 // ── Halaman Utama Todo ────────────────────────────────────────
 function Todo() {
-  const [todos, setTodos]       = useState([])
-  const [filter, setFilter]     = useState('Semua')
-  const [showAdd, setShowAdd]   = useState(false)
-  const [loading, setLoading]   = useState(true)
+  const [todos, setTodos] = useState([])
+  const [filter, setFilter] = useState('Semua')
+  const [showAdd, setShowAdd] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     loadTodos();
@@ -353,11 +353,11 @@ function Todo() {
     }
   };
 
-  const done  = todos.filter(t => t.done).length
+  const done = todos.filter(t => t.done).length
   const total = todos.length
 
   const filtered = todos.filter(t => {
-    if (filter === 'Belum')   return !t.done
+    if (filter === 'Belum') return !t.done
     if (filter === 'Selesai') return t.done
     return true
   })
@@ -409,10 +409,10 @@ function Todo() {
   }
 
   return (
-    <div className="p-5 md:p-6 max-w-3xl mx-auto">
+    <div className="p-4 pb-24 md:p-6 md:pb-6 max-w-3xl mx-auto">
 
       {/* Header Card */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-card p-5 mb-4">
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-card p-4 md:p-5 mb-4">
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center gap-2">
             <Sparkles size={16} className="text-primary-600" />
@@ -442,7 +442,7 @@ function Todo() {
               key={f}
               onClick={() => setFilter(f)}
               className={classNames(
-                'px-4 py-1.5 rounded-lg text-sm font-medium transition-all',
+                'px-3 md:px-4 py-1 md:py-1.5 rounded-lg text-xs md:text-sm font-medium transition-all',
                 filter === f
                   ? 'bg-primary-600 text-white shadow-sm'
                   : 'text-[#6A7282] hover:text-[#0a0a0a]'
@@ -455,7 +455,7 @@ function Todo() {
 
         <button
           onClick={() => setShowAdd(true)}
-          className="inline-flex items-center gap-2 h-10 px-4 bg-primary-600 text-white text-sm font-semibold rounded-xl hover:bg-primary-700 active:scale-95 transition-all"
+          className="inline-flex items-center gap-1 md:gap-2 h-9 md:h-10 px-3 md:px-4 bg-primary-600 text-white text-xs md:text-sm font-semibold rounded-xl hover:bg-primary-700 active:scale-95 transition-all"
         >
           <Plus size={16} />
           Tambah Tugas

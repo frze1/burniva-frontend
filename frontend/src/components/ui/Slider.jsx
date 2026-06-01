@@ -5,23 +5,23 @@ function Slider({ label, hint, value, onChange, min = 1, max = 10, minLabel = "R
   const percentage = ((value - min) / (max - min)) * 100;
 
   return (
-    <div className="w-full bg-white rounded-2xl p-5 border-[0.67px] border-gray-200 flex flex-col gap-5">
+    <div className="w-full bg-white rounded-2xl p-4 md:p-5 border-[0.67px] border-gray-200 flex flex-col gap-4 md:gap-5">
 
       {/* Header: Label & Value Box */}
       <div className="flex justify-between items-start gap-4">
         <div className="flex flex-col gap-1">
-          <h3 className="text-base font-medium text-gray-900">{label}</h3>
-          {hint && <p className="text-sm text-gray-500">{hint}</p>}
+          <h3 className="text-sm md:text-base font-medium text-gray-900">{label}</h3>
+          {hint && <p className="text-xs md:text-sm text-gray-500">{hint}</p>}
         </div>
 
         {/* Value Box (Kotak Biru) */}
-        <div className="w-16 h-10 bg-primary-50 rounded-[10px] border-[0.67px] border-primary-100 flex items-center justify-center flex-shrink-0">
-          <span className="text-xl font-medium text-primary-500">{value}</span>
+        <div className="w-12 h-9 md:w-16 md:h-10 bg-primary-50 rounded-[10px] border-[0.67px] border-primary-100 flex items-center justify-center flex-shrink-0">
+          <span className="text-sm md:text-xl font-medium text-primary-500">{value}</span>
         </div>
       </div>
 
       {/* Slider Track Area */}
-      <div className="flex flex-col gap-4 pt-2">
+      <div className="flex flex-col gap-3 md:gap-4 pt-1 md:pt-2">
         {/* Input Range Native yang di-styling */}
         <input
           type="range"
@@ -36,15 +36,10 @@ function Slider({ label, hint, value, onChange, min = 1, max = 10, minLabel = "R
           }}
         />
 
-        {/* Label Bawah (Min, Mid, Max) */}
-        <div className="flex justify-between items-center w-full">
-          <div className="bg-gray-50 rounded-lg border-[0.67px] border-gray-200 px-3 py-1">
-            <span className="text-xs text-gray-500">{min} · {minLabel}</span>
-          </div>
-          <span className="text-xs text-gray-400">{Math.round((max + min) / 2)}</span>
-          <div className="bg-gray-50 rounded-lg border-[0.67px] border-gray-200 px-3 py-1">
-            <span className="text-xs text-gray-500">{max} · {maxLabel}</span>
-          </div>
+        {/* Label Bawah (Min, Max) */}
+        <div className="flex justify-between items-center w-full pt-1">
+          <span className="text-[11px] md:text-sm font-medium text-gray-500">{min} - {minLabel}</span>
+          <span className="text-[11px] md:text-sm font-medium text-gray-500">{max} - {maxLabel}</span>
         </div>
       </div>
 

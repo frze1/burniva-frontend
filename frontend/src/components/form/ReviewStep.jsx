@@ -58,7 +58,7 @@ function ReviewStep({ formData }) {
       
       {/* Header Step Tinjau */}
       <div className="flex flex-col gap-1 w-full">
-        <h2 className="text-xl font-medium text-neutral-950 leading-7">
+        <h2 className="text-lg md:text-xl font-medium text-neutral-950 leading-7">
           Tinjau Data Kamu
         </h2>
         <p className="text-sm font-normal text-gray-500 leading-5">

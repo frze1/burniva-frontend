@@ -4,6 +4,7 @@ import ProfileView from '../components/profile/ProfileView';
 import ProfileEdit from '../components/profile/ProfileEdit';
 import useAuthStore from '../store/auth/useAuthStore';
 import authService from '../services/auth/authService';
+import Avatar from '../components/ui/Avatar';
 
 function Profile() {
   const authUser = useAuthStore((state) => state.user);
@@ -23,6 +24,8 @@ function Profile() {
   const [form, setForm] = useState(initialUser);
   const [isEdit, setIsEdit] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [personalErrorMsg, setPersonalErrorMsg] = useState('');
+  const [securityErrorMsg, setSecurityErrorMsg] = useState('');
 
   useEffect(() => {
     const fetchFreshProfile = async () => {
@@ -62,9 +65,50 @@ function Profile() {
     setImageFile(file);
   };
 
+  // Tangani ketika gambar dihapus
+  const handleImageRemove = () => {
+    setPreviewImage('');
+    setImageFile(null);
+  };
+
   const handleSave = async () => {
+    setPersonalErrorMsg('');
+    setSecurityErrorMsg('');
+
+    // Validasi kosong data pribadi
+    if (!form.nama || !form.email || !form.universitas || !form.prodi || form.semester === '' || form.semester === null) {
+      setPersonalErrorMsg("Nama, Email, Universitas, Program Studi, dan Semester wajib diisi.");
+      return;
+    }
+
+    // Validasi Regex Email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email)) {
+      setPersonalErrorMsg("Format email tidak valid.");
+      return;
+    }
+
+    // Validasi Umur & Semester tidak boleh negatif
+    if (form.umur < 0 || form.semester < 0) {
+      setPersonalErrorMsg("Umur dan Semester tidak boleh bernilai negatif.");
+      return;
+    }
 
     try {
+      if (passwords.new || passwords.old) {
+        if (!passwords.old) {
+          setSecurityErrorMsg("Silakan masukkan kata sandi lama untuk mengubah kata sandi.");
+          return;
+        }
+        if (passwords.new.length < 6) {
+          setSecurityErrorMsg("Kata sandi baru harus memiliki minimal 6 karakter.");
+          return;
+        }
+        if (passwords.new !== passwords.confirm) {
+          setSecurityErrorMsg("Konfirmasi kata sandi baru tidak sama.");
+          return;
+        }
+      }
 
       setLoading(true);
 
@@ -76,7 +120,9 @@ function Profile() {
         university: form.universitas,
         major: form.prodi,
         semester: form.semester,
-        profile_image: previewImage || user.photoUrl
+        profile_image: previewImage === '' ? null : (previewImage || user.photoUrl),
+        old_password: passwords.old,
+        new_password: passwords.new
       };
 
       const res =
@@ -118,23 +164,19 @@ function Profile() {
 
       setIsEdit(false);
 
-      setPreviewImage(
-        null
-      );
-
-      setImageFile(
-        null
-      );
+      setPreviewImage(null);
+      setImageFile(null);
+      setPasswords({ old: '', new: '', confirm: '' });
 
     } catch (error) {
-
       console.error(error);
-
-      alert(
-        error.response?.data?.message ||
-        "Gagal update profile"
-      );
-
+      const msg = error.response?.data?.message || "Gagal update profile";
+      // Asumsikan jika pesan error terkait kata sandi, tampilkan di keamanan
+      if (msg.toLowerCase().includes("sandi") || msg.toLowerCase().includes("password")) {
+        setSecurityErrorMsg(msg);
+      } else {
+        setPersonalErrorMsg(msg);
+      }
     } finally {
 
       setLoading(false);
@@ -148,29 +190,31 @@ function Profile() {
     setPreviewImage(null); // Hapus preview jika batal
     setImageFile(null);
     setPasswords({ old: '', new: '', confirm: '' });
+    setPersonalErrorMsg('');
+    setSecurityErrorMsg('');
     setIsEdit(false);
   };
 
   const initial = form?.nama?.charAt(0).toUpperCase() || 'U';
   // Tampilkan preview foto baru secara live di top bar saat edit
-  const displayImage = isEdit ? (previewImage || user.photoUrl) : user.photoUrl;
+  const displayImage = isEdit 
+    ? (previewImage === '' ? null : (previewImage || user.photoUrl)) 
+    : user.photoUrl;
 
   return (
-    <div className="p-6 md:p-10 md:px-12 min-h-screen bg-[#F8FAFC] flex flex-col gap-6 md:gap-8">
+    <div className="p-3 pb-24 md:p-10 md:px-12 min-h-screen bg-[#F8FAFC] flex flex-col gap-5 md:gap-8">
       <div className="w-full max-w-5xl mx-auto flex flex-col gap-6">
 
         {/* KARTU ATAS: Top Bar Tunggal yang Selaras Ukurannya dengan ProfileEdit */}
-        <div className="bg-white rounded-2xl border-[0.67px] border-gray-200 shadow-sm flex items-center justify-between gap-2 p-6 md:p-8 transition-all">
-          <div className="flex items-center gap-4 md:gap-6">
+        <div className="bg-white rounded-2xl border-[0.67px] border-gray-200 shadow-sm flex items-center justify-between gap-2 p-4 md:p-8 transition-all">
+          <div className="flex items-center gap-3 md:gap-6">
 
             {/* Area Avatar - Ukuran disamakan & proporsional */}
-            <div className="w-14 h-14 md:w-20 md:h-20 bg-blue-800 flex items-center justify-center text-white border-[0.67px] border-blue-100 overflow-hidden shrink-0 rounded-xl md:rounded-2xl transition-all">
-              {displayImage ? (
-                <img src={displayImage} alt="Avatar" className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-xl md:text-3xl font-medium">{initial}</span>
-              )}
-            </div>
+            <Avatar 
+              src={displayImage} 
+              name={isEdit ? form.nama : user.nama} 
+              className="w-12 h-12 md:w-20 md:h-20 text-lg md:text-3xl rounded-xl md:rounded-2xl border-[0.67px] border-blue-100" 
+            />
 
             {/* Nama Pengguna */}
             <h2 className="text-slate-800 md:text-neutral-950 font-bold md:font-semibold text-base md:text-xl leading-snug transition-all">
@@ -217,6 +261,9 @@ function Profile() {
             currentPhotoUrl={user.photoUrl}
             previewImage={previewImage}
             onImageSelected={handleImageSelected}
+            onImageRemove={handleImageRemove}
+            personalErrorMsg={personalErrorMsg}
+            securityErrorMsg={securityErrorMsg}
           />
         )}
 

@@ -25,7 +25,7 @@ function ProfilAdmin() {
         }
 
         try {
-            // Update nama, email, profile image
+            // Update nama, email, profile image, dan password
             await authService.updateProfile({
                 name: adminName,
                 email: email,
@@ -34,17 +34,10 @@ function ProfilAdmin() {
                 age: user?.age,
                 university: user?.university,
                 major: user?.major,
-                semester: user?.semester
+                semester: user?.semester,
+                old_password: oldPassword || undefined,
+                new_password: newPassword || undefined
             })
-
-            // Update password jika ada input
-            if (newPassword && oldPassword) {
-                await api.put('/user/change-password', {
-                    current_password: oldPassword,
-                    new_password: newPassword,
-                    confirm_password: confirmPassword
-                })
-            }
 
             alert('Perubahan berhasil disimpan!')
 

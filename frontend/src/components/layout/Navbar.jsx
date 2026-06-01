@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Menu, X, Activity } from 'lucide-react'
 import { ROUTES } from '../../utils/constants'
@@ -15,27 +15,97 @@ const navLinks = [
 function Navbar() {
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [activeSection, setActiveSection] = useState('beranda')
+
+  useEffect(() => {
+    const getActiveSection = () => {
+      const offset = 96
+
+      let current = navLinks[0].href.replace('#', '')
+
+      navLinks.forEach(({ href }) => {
+        const id = href.replace('#', '')
+        const section = document.getElementById(id)
+
+        if (!section) return
+
+        const sectionTop =
+          section.getBoundingClientRect().top + window.scrollY
+
+        if (window.scrollY + offset >= sectionTop) {
+          current = id
+        }
+      })
+
+      setActiveSection(current)
+    }
+
+    getActiveSection()
+
+    window.addEventListener('scroll', getActiveSection, { passive: true })
+    window.addEventListener('resize', getActiveSection)
+
+    return () => {
+      window.removeEventListener('scroll', getActiveSection)
+      window.removeEventListener('resize', getActiveSection)
+    }
+  }, [])
 
   const scrollTo = (href) => {
     setMenuOpen(false)
+
     const el = document.querySelector(href)
-    if (el) el.scrollIntoView({ behavior: 'smooth' })
+    if (!el) return
+
+    const offset = 80
+    const top =
+      el.getBoundingClientRect().top + window.scrollY - offset
+
+    window.scrollTo({
+      top,
+      behavior: 'smooth',
+    })
+
+    setActiveSection(href.replace('#', ''))
   }
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white border-b border-slate-100">
       <div className="w-full px-6 sm:px-10 md:px-16 lg:px-24 h-16 flex items-center justify-between">
         <Logo />
-        <nav className="hidden md:flex items-center gap-6">
-          {navLinks.map(({ label, href }) => (
-            <button
-              key={href}
-              onClick={() => scrollTo(href)}
-              className="text-sm text-slate-500 hover:text-slate-800 transition-colors"
-            >
-              {label}
-            </button>
-          ))}
+        <nav className="hidden md:flex items-center gap-8">
+          {navLinks.map(({ label, href }) => {
+            const isActive = activeSection === href.replace('#', '')
+
+            return (
+              <button
+                key={href}
+                onClick={() => scrollTo(href)}
+                className={`
+                  relative py-2 text-sm transition-colors duration-300
+                  ${
+                    isActive
+                      ? 'font-bold text-primary-700'
+                      : 'font-medium text-slate-500 hover:text-slate-800'
+                  }
+                `}
+              >
+                {label}
+
+                <span
+                  className={`
+                    absolute left-1/2 -bottom-0.5 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-primary-600
+                    transition-all duration-300 ease-out
+                    ${
+                      isActive
+                        ? 'opacity-100 scale-100'
+                        : 'opacity-0 scale-0'
+                    }
+                  `}
+                />
+              </button>
+            )
+          })}
         </nav>
 
         <div className="hidden md:flex items-center gap-2">

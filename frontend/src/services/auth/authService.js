@@ -46,14 +46,12 @@ const authService = {
         email: data.email,
         gender: data.gender,
         age: Number(data.age),
-        university:
-          data.university,
+        university: data.university,
         major: data.major,
-        semester:
-          Number(data.semester),
-
-        profile_image:
-          data.profile_image,
+        semester: Number(data.semester),
+        profile_image: data.profile_image,
+        old_password: data.old_password,
+        new_password: data.new_password,
       }
     )
 
